@@ -1,0 +1,9 @@
+rootProject.name = 'test_react_native'
+include ':react-native-secure-randombytes'
+project(':react-native-secure-randombytes').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-secure-randombytes/android')
+include ':react-native-safe-crypto'
+project(':react-native-safe-crypto').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-safe-crypto/android')
+include ':react-native-randombytes'
+project(':react-native-randombytes').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-randombytes/android')
+
+include ':app'

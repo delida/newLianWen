@@ -61,7 +61,7 @@ const Hexstring2btye = (str)=> {
     }
     return hexA;
 }
-
+///////测试提交
 // 创建账户 (scripts环境不可用)
 export function registerUser(pwd) {
 	var registerInfo = {};

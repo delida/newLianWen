@@ -118,7 +118,9 @@ export default class App extends React.Component {
     // 0x9211dfe342b1909267ca038f33bb0976203516ade5eddfdaa912b8e53fad678d
     // 0xb6c2736dffd5feabea3d0d34e1048e2947a6012c190f3d66c009ecf5fb0f85df
     // createSubTopic("0x98ffdd9f06b7bc399b87f60999d9da85f160c680a17f4039b6838d7c2c0f8fcc", 
-    // "it is good", userAddr);
+    //   "it is good", userAddr).then((data) => {
+    //   console.log(data);
+    // });
 
     // 点赞  1a8dfd66c240d1ed797d32ee79c19bd470c65a965e8fccdd962196701028a637
     // approveSubTopic(userAddr, 
@@ -127,10 +129,10 @@ export default class App extends React.Component {
     //   });
 
     // 回答列表(暂未做分页)
-    // getSubTopicList("0x98ffdd9f06b7bc399b87f60999d9da85f160c680a17f4039b6838d7c2c0f8fcc",
-    //      0,0).then((data) => {
-    //        console.log(data);
-    // });
+    getSubTopicList("0x98ffdd9f06b7bc399b87f60999d9da85f160c680a17f4039b6838d7c2c0f8fcc",
+         0,0).then((data) => {
+           console.log(data);
+    });
 
     // 获取子链余额
     // getMicroChainBalance(userAddr).then((data) => {

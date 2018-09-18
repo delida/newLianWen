@@ -309,9 +309,10 @@ export var createSubTopic = function (topicHash, desc, userAddr) {
         t = Date.now();
         sleep((packPerBlockTime + 2) * 1000);
         getContractInfo(url,"ScsRPCMethod.GetTxRlt", postParam2).then(function(subTopicHash){
-          console.log("0x" + subTopicHash);
+          //console.log("0x" + subTopicHash);
           result.subTopicHash = "0x" + subTopicHash;
           result.isSuccess = 1;
+          resolve(result);
         });
 			
 		});

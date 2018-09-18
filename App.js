@@ -15,6 +15,8 @@ import {getTopicList} from './api/bussApi';
 import {approveSubTopic} from './api/bussApi';
 import {getSubTopicList} from './api/bussApi';
 import {buyToken} from './api/accountApi';
+import {getBoardList} from './api/bussApi';
+import {myTopicList} from './api/bussApi';
 
 import config from "./api/lwconfig.json"
 
@@ -85,7 +87,7 @@ export default class App extends React.Component {
     // });
 
     // 充值
-    // chargeToken(userAddr, 10).then((data) => {
+    // chargeToken(userAddr, 5.55).then((data) => {
 
     // })
 
@@ -139,6 +141,17 @@ export default class App extends React.Component {
     // autoCheck(userAddr).then((data) => {
     //   this.setState({r:data});
     // });
+
+    // 版块管理
+    // getBoardList().then((data) => {
+    //   console.log(data);
+    // });
+
+    // 我的链问列表
+    // myTopicList(config.userAddr, config.subChainAddr).then((data) => {
+    //   //console.log(data);
+    // });
+
   }
 }
 

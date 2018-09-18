@@ -129,14 +129,14 @@ export var chargeToken = function (userAddr, value) {
 	return new Promise((resolve, reject) => {
 		try {
 			getBalance(userAddr).then((balance1) => {    // 查询当前erc20余额
-				console.log("充值兑换前---------" + balance1);
+				console.log("充值兑换前---------" + JSON.stringify(balance1));
 				testbuyMintToken(userAddr, pwd, value); // moac兑换主链erc20
 
 				var interval = setInterval(function(){
 					console.log("wait for buyToken-----");
 					getBalance(userAddr).then((balance2) => { 
 						if(balance1.erc20Balance != balance2.erc20Balance){   // 每3s执行一次查询是否兑换成功
-							console.log("充值兑换后---------" + balance2);
+							console.log("充值兑换后---------" + JSON.stringify(balance2));
 							console.log("开始子链充值-----");
 							testrequestEnterMicrochain(userAddr, pwd, chain3.toSha(value, 'mc'));  // 兑换成功则执行子链充值，并跳出interval
 							clearInterval(interval);
@@ -150,9 +150,7 @@ export var chargeToken = function (userAddr, value) {
 			console.log("充值报错--------" + e);
 			reject(0);
 		}
-	});
-	
-	
+	});	
 }
 
 export var buyToken = function (userAddr, value) {

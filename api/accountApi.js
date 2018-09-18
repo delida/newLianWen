@@ -21,13 +21,7 @@ var port = config.port;
 var packPerBlockTime = config.packPerBlockTime;   // 子链出块时间单位s
 var decimals = config.decimals;   // 子链token精度
 var mc = chain3.mc;
-//import {randomBytes} from "./randomUtil.js"
-//import Thirdparty from "../thirdparty.js"
 
-//import { randomBytes } from 'react-native-secure-randombytes'
-//window.randomBytes = asyncRandomBytes;
-
-// import { randomBytes } from 'react-native-randombytes'
 var marketabletokenaddr = config.marketableTokenAddr;
 var marketabletokenAbi= "[{\"constant\":true,\"inputs\":[{\"name\":\"useraddr\",\"type\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"sellMintTokenPre\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"useraddr\",\"type\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"sellMintToken\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_subtractedValue\",\"type\":\"uint256\"}],\"name\":\"decreaseApproval\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newowner\",\"type\":\"address\"}],\"name\":\"updateOwner\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"addr\",\"type\":\"address[]\"},{\"name\":\"bals\",\"type\":\"uint256[]\"}],\"name\":\"redeemFromMicroChain\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"useraddr\",\"type\":\"address\"},{\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"buyMintToken\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"useraddr\",\"type\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"requestEnterMicrochain\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"priceOneGInMOAC\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_addedValue\",\"type\":\"uint256\"}],\"name\":\"increaseApproval\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"tokensupply\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}]"
 var marketabletokenContract=chain3.mc.contract(JSON.parse(marketabletokenAbi));
@@ -61,7 +55,7 @@ const Hexstring2btye = (str)=> {
     }
     return hexA;
 }
-
+///////测试提交
 // 创建账户 (scripts环境不可用)
 export function registerUser(pwd) {
 	var registerInfo = {};
@@ -144,7 +138,7 @@ export var chargeToken = function (userAddr, value) {
 						if(balance1.erc20Balance != balance2.erc20Balance){   // 每3s执行一次查询是否兑换成功
 							console.log("充值兑换后---------" + balance2);
 							console.log("开始子链充值-----");
-							testrequestEnterMicrochain(userAddr, pwd, value);  // 兑换成功则执行子链充值，并跳出interval
+							testrequestEnterMicrochain(userAddr, pwd, chain3.toSha(value, 'mc'));  // 兑换成功则执行子链充值，并跳出interval
 							clearInterval(interval);
 							resolve(1);
 						}
@@ -171,16 +165,16 @@ export var redeemToken = function (userAddr, value) {
 	return new Promise((resolve, reject) => {
 	try {
 		getBalance(userAddr).then((balance1) => {    // 查询当前erc20余额
-			console.log("提币前主链代币---------" + balance1);
-			dappredeemFromMicroChain(userAddr, pwd, value).then((data) => {   // 提币
+			console.log("提币前主链代币---------" + JSON.stringify(balance1));
+			dappredeemFromMicroChain(userAddr, pwd, chain3.toSha(value, 'mc')).then((data) => {   // 提币
 				var interval = setInterval(function(){
 					console.log("wait for redeemToken-----");
 					getBalance(userAddr).then((balance2) => {    // 查询当前erc20余额
 						
 						if(balance1.erc20Balance != balance2.erc20Balance){   // 每3s执行一次查询是否兑换成功
-							console.log("提币后主链代币---------" + balance2);
+							console.log("提币后主链代币---------" + JSON.stringify(balance2));
 							console.log("提币成功，开始兑换moac-----");
-							testsellMintToken(userAddr, pwd, value);  // 提币成功则执行moac兑换，并跳出interval
+							testsellMintToken(userAddr, pwd, chain3.toSha(value, 'mc'));  // 提币成功则执行moac兑换，并跳出interval
 							clearInterval(interval);
 							resolve(1);
 						}

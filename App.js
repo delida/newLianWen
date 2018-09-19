@@ -81,18 +81,18 @@ export default class App extends React.Component {
     //console.log(loginUser(addr, pwd, JSON.stringify(keystore)));
 
     //获取moac和erc20余额 
-    // getBalance(config.userAddr).then((data) => {
-    //   //console.log(data);
-    //   this.setState({r:data.erc20Balance});
+    // getBalance(config.userAddr2, config.marketableTokenAddr).then((data) => {
+    //   console.log(data);
+    //   //this.setState({r:data.erc20Balance});
     // });
 
     // 充值
-    // chargeToken(userAddr, 5.55).then((data) => {
+    // chargeToken(config.userAddr2, 15, config.marketableTokenAddr, config.pwd, "").then((data) => {
 
     // })
 
     // 提币
-    // redeemToken(userAddr, 5).then((data) => {
+    // redeemToken(config.userAddr2, 0.3, config.marketableTokenAddr, config.pwd, "").then((data) => {
 
     // })
 
@@ -104,43 +104,45 @@ export default class App extends React.Component {
 
     // 创建topic  
     // createTopic(1, "are you happy, if you are not happy, i will ask you if you are ok, if you are not ok?", 30, 
-    // userAddr).then((data) => {
+    // config.userAddr2, config.pwd, "", config.subChainAddr, config.rpcIp).then((data) => {
     //   console.log(data);
     // })
 
     // 获取topic列表(暂未分页)  
-    // getTopicList(0,0).then((data) => {
+    //  getTopicList(0,0, config.pwd, "", config.subChainAddr,
+    //  config.rpcIp).then((data) => {
     //   //this.setState({r:data});
     // });
 
     // 创建subTopic   
-    // 0x2fd067db39eefbd5a37d4b924781997dba2baa7fef47ff7283520b34464817a8
-    // 0x9211dfe342b1909267ca038f33bb0976203516ade5eddfdaa912b8e53fad678d
-    // 0xb6c2736dffd5feabea3d0d34e1048e2947a6012c190f3d66c009ecf5fb0f85df
-    // createSubTopic("0x98ffdd9f06b7bc399b87f60999d9da85f160c680a17f4039b6838d7c2c0f8fcc", 
-    //   "it is good", userAddr).then((data) => {
+    // 0x2ae964d3f6e550e335fa662c92f39b6b55aed8a5c02af954aac1a63a473bec2f
+    // 
+    // 
+    // createSubTopic("0xcd5cffdd06ae430fe5cbb734b86f2aaa81abb7e75bbf9c62594748b856c14abb", 
+    //   "it is good", config.userAddr2, config.pwd, "", config.subChainAddr, config.rpcIp).then((data) => {
     //   console.log(data);
     // });
 
-    // 点赞  1a8dfd66c240d1ed797d32ee79c19bd470c65a965e8fccdd962196701028a637
-    // approveSubTopic(userAddr, 
-    //   "0x9211dfe342b1909267ca038f33bb0976203516ade5eddfdaa912b8e53fad678d").then((data) => {
+    // 点赞  0x2ae964d3f6e550e335fa662c92f39b6b55aed8a5c02af954aac1a63a473bec2f
+    //  approveSubTopic(config.userAddr2, 
+    //    "0x2ae964d3f6e550e335fa662c92f39b6b55aed8a5c02af954aac1a63a473bec2f", config.subChainAddr,
+    // config.pwd, "", config.rpcIp).then((data) => {
     //     console.log(data);
-    //   });
+    //    });
 
     // 回答列表(暂未做分页)
-    getSubTopicList("0x98ffdd9f06b7bc399b87f60999d9da85f160c680a17f4039b6838d7c2c0f8fcc",
-         0,0).then((data) => {
-           console.log(data);
-    });
+    // getSubTopicList("0xcd5cffdd06ae430fe5cbb734b86f2aaa81abb7e75bbf9c62594748b856c14abb",
+    //      0,0, config.pwd, "", config.subChainAddr, config.rpcIp).then((data) => {
+    //        console.log(data);
+    // });
 
     // 获取子链余额
-    // getMicroChainBalance(userAddr).then((data) => {
+    // getMicroChainBalance(config.userAddr2, config.pwd, "", config.subChainAddr, config.rpcIp).then((data) => {
     //   this.setState({r:data});
     // });
 
     // autoCheck
-    // autoCheck(userAddr).then((data) => {
+    // autoCheck(userAddr, config.pwd, "", config.subChainAddr, config.rpcIp).then((data) => {
     //   this.setState({r:data});
     // });
 
@@ -150,8 +152,9 @@ export default class App extends React.Component {
     // });
 
     // 我的链问列表
-    // myTopicList(config.userAddr, config.subChainAddr).then((data) => {
-    //   //console.log(data);
+    // myTopicList(config.userAddr2, config.subChainAddr, config.pwd, "", 
+    //   config.rpcIp, config.deployLwSolAdmin).then((data) => {
+    //   console.log(data);
     // });
 
   }

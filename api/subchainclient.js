@@ -53,43 +53,13 @@ var scsaddr511 = "5a6ed879c2b6226ef270bc078ba71db9a42557ff"
 var scsaddr512 = "79675b8d37286d5063a4ccf6c226c69848c4b191"
 //========================================================================
 var answerBond = "0.15";
-var obj = {
-		// 创建问题
-		createTopicSol: function (amount, expblk, desc, subchainaddr, nonce)
-		{
-			var award=chain3.toSha(amount,'mc')
-			var data=deChatInstance.createTopic.getData(award, expblk, desc)
-			sendshardingflagtx(baseaddr,basename,subchainaddr,amount,data,nonce)//transfer Token to dappa
-		},
 
-		// 创建回答
-		createSubTopicSol: function (desc, subchainaddr,topHash, nonce)
-		{
-			var data=deChatInstance.creatSubTopic.getData(topHash, desc)
-			//var data ='0x957bceff' + '000000000000000000000000000000000000000000000000000000003b9aca01'
-			sendshardingflagtx(baseaddr,basename,subchainaddr,answerBond,data,nonce)
-		},
-		
-		// 点赞
-		voteOnTopic: function (vote, pwd, subchainaddr,subHash, nonce)
-		{
-			var data=deChatInstance.voteOnTopic.getData(subHash)
-			sendshardingflagtx(vote,pwd,subchainaddr,'0',data,nonce)
-		},
-		// autoCheck
-		autoCheck: function (subchainaddr, nonce)
-		{
-			var data=deChatInstance.autoCheck.getData()
-			sendshardingflagtx(baseaddr,basename,subchainaddr,'0',data,nonce)
-		}
-		
-}
-export function createTopicSol(amount, expblk, desc, subchainaddr, nonce)
+export function createTopicSol(userAddr, pwd, amount, expblk, desc, subchainaddr, nonce)
 {
 	
 	var award=chain3.toSha(amount,'mc')
 	var data=deChatInstance.createTopic.getData(award, expblk, desc)
-	sendshardingflagtx(baseaddr,basename,subchainaddr,amount,data,nonce)//transfer Token to dappa
+	sendshardingflagtx(userAddr, pwd,subchainaddr,amount,data,nonce)//transfer Token to dappa
 }
 function sendtx(src, tgtaddr, amount, strData) {
 
@@ -199,43 +169,10 @@ function getSCSRole(dappaddr,dapppasswd,subchainaddr,scsaddress)
 // Send Sharding Flag tx
 export function sendshardingflagtx(baseaddr,basename,subchainaddr,amount,code,n)
 {
-	//chain3.personal.unlockAccount(baseaddr,basename,0);
-	//vias=['0xd344716b819fc0e8bb5935756e6ed8da6b3077b9','0xd344716b819fc0e8bb5935756e6ed8da6b3077b9']
+	
 	return new Promise(function(resolve, reject){
 		
-		// mc.getBalance(userAddr, (err, moacRes) => {
-			
-		// 	var todata = "0x70a08231" + "000000000000000000000000" + config.userAddr.substring(2);
-		// 	chain3.mc.call({
-		// 	to: config.marketableTokenAddr,  // 合约地址
-		// 	data: todata
-		// 	}, 'latest', (error, response) => {
-		// 		var balance = {};
-		// 		balance.moacBalance = chain3.fromSha(moacRes.toString(), 'mc');
-		// 		balance.erc20Balance = chain3.fromSha(parseInt(response.substring(2),16), 'mc');
-				
-		// 		resolve(balance);
-				
-		// 	});	
-		// });
-		// chain3.personal.unlockAccount(baseaddr,basename,0, function (error, response) {
-		// 	console.log(11111);
-		// 	chain3.mc.sendTransaction(
-		// 		{
-		// 			from: baseaddr,
-		// 			value:chain3.toSha(amount,'mc'),
-		// 			to: subchainaddr,
-		// 			gas: '0',//'200000',
-		// 			gasPrice: '0',//chain3.mc.gasPrice,
-		// 			ShardingFlag: '0x1',
-		// 			data: code,
-		// 			nonce: n,
-		// 			via:'0xd868337c1a4167b5c6d1e273a0044016ea044d82'
-		// 		}, function (err, res) {
-		// 			resolve("111");
-				
-		// 		})
-		// });
+		
 		chain3.mc.sendTransaction(
 			{
 				from: baseaddr,
@@ -246,7 +183,7 @@ export function sendshardingflagtx(baseaddr,basename,subchainaddr,amount,code,n)
 				ShardingFlag: '0x1',
 				data: code,
 				nonce: n,
-				via:'0xd868337c1a4167b5c6d1e273a0044016ea044d82'
+				via: config.via
 			}, function (err, res) {
 				resolve("111");
 			
@@ -423,12 +360,12 @@ function transferToken(recv, amount, subchainaddr, nonce)
 //}
 var topHash='0x' + 'c456527f086a32e01426623d164d03febc5461daf51495d688411d0891a3d863'
 //creatSubTopic('是的', subchainaddr1,topHash,2)
-export function createSubTopicSol(desc, subchainaddr,topHash, nonce)
+export function createSubTopicSol(userAddr, pwd, desc, subchainaddr,topHash, nonce)
 {
 	var data=deChatInstance.creatSubTopic.getData(topHash, desc)
 	//var data ='0x957bceff' + '000000000000000000000000000000000000000000000000000000003b9aca01'
 	
-	sendshardingflagtx(baseaddr,basename,subchainaddr,'3',data,nonce)
+	sendshardingflagtx(userAddr, pwd,subchainaddr,'3',data,nonce)
 }
 
 		
@@ -605,5 +542,3 @@ function increaseHexByOne(strhex) {
 //		"548d7dd81845a7b2083db02e46799bcf7cd39a5a627e47086891654aa2b2e09d", 4)
 		
 
-
-module.exports = obj;

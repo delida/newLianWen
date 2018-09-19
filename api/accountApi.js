@@ -12,20 +12,20 @@ import config from "./lwconfig.json"
 import assert from "assert"
 import Chain3 from 'chain3';
 
-var pwd = config.pwd;
-var userAddr = config.userAddr;
-var subChainAddr = config.subChainAddr;
+//var pwd = config.pwd;
+//var userAddr = config.userAddr;
+//var subChainAddr = config.subChainAddr;
 var chain3 = new Chain3(new Chain3.providers.HttpProvider(config.vnodeIp));
-var ip = config.rpcIp;
-var port = config.port;
+// var ip = config.rpcIp;
+// var port = config.port;
 var packPerBlockTime = config.packPerBlockTime;   // 子链出块时间单位s
 var decimals = config.decimals;   // 子链token精度
 var mc = chain3.mc;
 
-var marketabletokenaddr = config.marketableTokenAddr;
-var marketabletokenAbi= "[{\"constant\":true,\"inputs\":[{\"name\":\"useraddr\",\"type\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"sellMintTokenPre\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"useraddr\",\"type\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"sellMintToken\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_subtractedValue\",\"type\":\"uint256\"}],\"name\":\"decreaseApproval\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newowner\",\"type\":\"address\"}],\"name\":\"updateOwner\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"addr\",\"type\":\"address[]\"},{\"name\":\"bals\",\"type\":\"uint256[]\"}],\"name\":\"redeemFromMicroChain\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"useraddr\",\"type\":\"address\"},{\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"buyMintToken\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"useraddr\",\"type\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"requestEnterMicrochain\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"priceOneGInMOAC\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_addedValue\",\"type\":\"uint256\"}],\"name\":\"increaseApproval\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"tokensupply\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}]"
-var marketabletokenContract=chain3.mc.contract(JSON.parse(marketabletokenAbi));
-export var marketabletoken=marketabletokenContract.at(marketabletokenaddr);
+//var marketabletokenaddr = config.marketableTokenAddr;
+// var marketabletokenAbi = config.marketabletokenAbi
+// var marketabletokenContract=chain3.mc.contract(JSON.parse(marketabletokenAbi));
+// export var marketabletoken=marketabletokenContract.at(marketabletokenaddr);
 
 const Bytes2HexString = (b)=> {
     let hexs = "";
@@ -83,9 +83,13 @@ export function registerUser(pwd) {
 // 3 pwd和keystore解析出来私钥，地址，对比地址和输入地址是否一致
 export function loginUser(addr, pwd, keystore) {
 	try {
-		
+		console.log(11111111111);
 		var keystoreObj = JSON.parse(keystore);
+		console.log(22222);
 		var address = decrypt(keystoreObj, pwd).address + '';
+		console.log(333333);
+		console.log(address);
+		console.log(addr);
 		if (address.toLowerCase() == addr.toLowerCase()) {
 			return 1
 		} else {
@@ -103,19 +107,20 @@ export function loginUser(addr, pwd, keystore) {
 }
 
 // 查询主链的MOAC和erc20余额
-export var getBalance = function (userAddr) {
+export var getBalance = function (userAddr, marketableTokenAddr) {
 	return new Promise(function(resolve, reject){
 		
 		mc.getBalance(userAddr, (err, moacRes) => {
 			
-			var todata = "0x70a08231" + "000000000000000000000000" + config.userAddr.substring(2);
+			var todata = "0x70a08231" + "000000000000000000000000" + userAddr.substring(2);
 			chain3.mc.call({
-			to: config.marketableTokenAddr,  // 合约地址
+			to: marketableTokenAddr,  // 合约地址
 			data: todata
 			}, 'latest', (error, response) => {
 				var balance = {};
 				balance.moacBalance = chain3.fromSha(moacRes.toString(), 'mc');
 				balance.erc20Balance = chain3.fromSha(parseInt(response.substring(2),16), 'mc');
+				balance.isSuccess = 1;
 				//console.log(balance);
 				resolve(balance);
 				
@@ -124,17 +129,18 @@ export var getBalance = function (userAddr) {
 	});	
 }
 
+
 // 充值（moac兑换主链token, 然后充值进子链）
-export var chargeToken = function (userAddr, value) {
+export var chargeToken = function (userAddr, value, marketableTokenAddr, pwd, keystore) {
 	return new Promise((resolve, reject) => {
 		try {
-			getBalance(userAddr).then((balance1) => {    // 查询当前erc20余额
+			getBalance(userAddr, marketableTokenAddr).then((balance1) => {    // 查询当前erc20余额
 				console.log("充值兑换前---------" + JSON.stringify(balance1));
 				testbuyMintToken(userAddr, pwd, value); // moac兑换主链erc20
 
 				var interval = setInterval(function(){
 					console.log("wait for buyToken-----");
-					getBalance(userAddr).then((balance2) => { 
+					getBalance(userAddr, marketableTokenAddr).then((balance2) => { 
 						if(balance1.erc20Balance != balance2.erc20Balance){   // 每3s执行一次查询是否兑换成功
 							console.log("充值兑换后---------" + JSON.stringify(balance2));
 							console.log("开始子链充值-----");
@@ -159,15 +165,15 @@ export var buyToken = function (userAddr, value) {
 
 
 // 提币
-export var redeemToken = function (userAddr, value) {
+export var redeemToken = function (userAddr, value, marketableTokenAddr, pwd, keystore) {
 	return new Promise((resolve, reject) => {
 	try {
-		getBalance(userAddr).then((balance1) => {    // 查询当前erc20余额
+		getBalance(userAddr, marketableTokenAddr).then((balance1) => {    // 查询当前erc20余额
 			console.log("提币前主链代币---------" + JSON.stringify(balance1));
 			dappredeemFromMicroChain(userAddr, pwd, chain3.toSha(value, 'mc')).then((data) => {   // 提币
 				var interval = setInterval(function(){
 					console.log("wait for redeemToken-----");
-					getBalance(userAddr).then((balance2) => {    // 查询当前erc20余额
+					getBalance(userAddr, marketableTokenAddr).then((balance2) => {    // 查询当前erc20余额
 						
 						if(balance1.erc20Balance != balance2.erc20Balance){   // 每3s执行一次查询是否兑换成功
 							console.log("提币后主链代币---------" + JSON.stringify(balance2));
@@ -177,7 +183,7 @@ export var redeemToken = function (userAddr, value) {
 							resolve(1);
 						}
 					});	
-				}, 3000);
+				}, 30000);
 			});
 		});
 

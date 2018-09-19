@@ -93,52 +93,7 @@ var cache = [
   '         '
 ];
 
-var obj = {
-	// moac兑换token
-	testbuyMintToken: function (sender, passwd, pay)
-	{
-		////chain3.personal.unlockAccount(sender, passwd, 0);
-		var data=subchainbase.buyMintToken.getData();
-		sendtx(sender, subchainbase.address, pay, data);
-	},
-	
-	// 充值进子链
-	testrequestEnterMicrochain: function (sender, passwd, amount)
-	{
-		////chain3.personal.unlockAccount(sender, passwd, 0);
-		var data=subchainbase.requestEnterMicrochain.getData(amount);
-		sendtx(sender, subchainbase.address, '0', data);
-	},
 
-	// token兑换moac
-	testsellMintToken: function (sender, passwd, amount)
-	{
-		////chain3.personal.unlockAccount(sender, passwd, 0);
-		var data=subchainbase.sellMintToken.getData(amount);
-		sendtx(sender, subchainbase.address, '0', data);
-	},
-	
-	// 提币
-	dappredeemFromMicroChain: function (sender, passwd, amount)
-	{
-		//chain3.personal.unlockAccount(sender,passwd,0);
-		chain3.mc.sendTransaction(
-			{
-				from: sender,
-				value:amount,
-				to: subchainbase.address,
-				gas: "0",
-				gasPrice: "0",
-				shardingflag: 1,
-				nonce: 0,
-				data: '0x89739c5b',
-				via: config.via
-			});
-			
-		//console.log('sending from:' + 	src + ' to:' + tgtaddr  + ' with data:' + strData);
-	}
-	
-}
 
 var cache = [
 	  '',
@@ -477,7 +432,7 @@ var cache = [
 		//console.log('sending from:' + 	src + ' to:' + tgtaddr  + ' with data:' + strData);
 	}
 
-	function dappredeemFromMicroChain(sender, passwd, amount)
+	export function dappredeemFromMicroChain(sender, passwd, amount)
 	{
 		//chain3.personal.unlockAccount(sender,passwd,0);
 		return new Promise((resolve) => {
@@ -617,7 +572,6 @@ var cache = [
 	}
 	
 	
-module.exports = obj;
 	
 	
 	

@@ -20,6 +20,11 @@ var packPerBlockTime = config.packPerBlockTime;   // 子链出块时间单位s
 var decimals = config.decimals;   // 子链token精度
 var mc = chain3.mc;
 
+var dechatmanagementaddr = config.manageSolAddress;
+var dechatmanagementAbi= "[{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"boardList\",\"outputs\":[{\"name\":\"subchainAddr\",\"type\":\"address\"},{\"name\":\"boardName\",\"type\":\"bytes32\"},{\"name\":\"picPath\",\"type\":\"bytes32\"},{\"name\":\"boardStatus\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"status\",\"type\":\"uint256\"},{\"name\":\"subchainAddr\",\"type\":\"address\"}],\"name\":\"updateBoardStatus\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"subchainAddr\",\"type\":\"address\"},{\"name\":\"boardName\",\"type\":\"bytes32\"},{\"name\":\"picPath\",\"type\":\"bytes32\"}],\"name\":\"creatBoard\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"status\",\"type\":\"uint256\"}],\"name\":\"getBoardlist\",\"outputs\":[{\"name\":\"\",\"type\":\"address[]\"},{\"name\":\"\",\"type\":\"bytes32[]\"},{\"name\":\"\",\"type\":\"bytes32[]\"},{\"name\":\"\",\"type\":\"uint256[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"constructor\"}]"
+var dechatmanagementContract=chain3.mc.contract(JSON.parse(dechatmanagementAbi));
+var dechatmanagement=dechatmanagementContract.at(dechatmanagementaddr);
+
 const Bytes2HexString = (b)=> {
   let hexs = "";
   for (let i = 0; i < b.length; i++) {
@@ -65,6 +70,7 @@ export var getContractInfo = function(url, methodName, postParam) {
             } else{
                 rpcResult = datas.result.Storage;
             }
+            
 		    resolve(rpcResult);
         }); 
 
@@ -230,7 +236,7 @@ export var getTopicList = function (pageNum, pageSize) {
                   var prefixStr = descStr.substring(0, descStr.length - 2);
                   var suffixStr = descStr.substring(descStr.length - 2, descStr.length);
                   var suffixInt = parseInt(suffixStr, 16);
-                  var owner = topicResult[prefixStr + converHex(suffixInt + 1)]; 
+                  //var owner = topicResult[prefixStr + converHex(suffixInt + 1)]; 
                   var valueArr = [];
                   var descStr = "";
                   for (var k in topicResult) {
@@ -303,9 +309,10 @@ export var createSubTopic = function (topicHash, desc, userAddr) {
         t = Date.now();
         sleep((packPerBlockTime + 2) * 1000);
         getContractInfo(url,"ScsRPCMethod.GetTxRlt", postParam2).then(function(subTopicHash){
-          console.log("0x" + subTopicHash);
+          //console.log("0x" + subTopicHash);
           result.subTopicHash = "0x" + subTopicHash;
           result.isSuccess = 1;
+          resolve(result);
         });
 			
 		});
@@ -469,6 +476,92 @@ export var autoCheck = function (userAddr) {
     autoCheckSol(subChainAddr, nonce);
     return 1;
 	});
+}
+
+// 我的链问列表
+export var myTopicList = function (userAddr, subChainAddr) {
+  return new Promise ((resolve) => {
+    // 先set abi
+    var postParam3 = {
+      "SubChainAddr": subChainAddr,
+      "Sender": config.deployLwSolAdmin,
+      "Data": config.lwAbi
+    };
+    getContractInfo(url,"ScsRPCMethod.SetDappAbi", postParam3).then(function(result){
+      
+      if (result == "success") {
+        // 获取列表
+        var postParam3 = {
+          "SubChainAddr": subChainAddr,
+          "Sender": config.deployLwSolAdmin,
+          "Params": ["getMyTopic", userAddr]
+        };
+        getContractInfo(url,"ScsRPCMethod.AnyCall", postParam3).then(function(topicList){
+          
+          var replaceStr1 = topicList.replace(new RegExp(/\"Hash\":/g),"\"Hash\":\"");
+          var replaceStr2 = replaceStr1.replace(new RegExp(/,\"Owner\":/g),"\",\"Owner\":");
+          var replaceStr3 = replaceStr2.replace(new RegExp(/Owner\":/g),"Owner\":\"");
+          var replaceStr4 = replaceStr3.replace(new RegExp(/BestHash\":/g),"BestHash\":\"");
+          var replaceStr5 = replaceStr4.replace(new RegExp(/,\"SecondBestVote/g),"\",\"SecondBestVote");
+          var replaceStr6 = replaceStr5.replace(new RegExp(/,\"Closed/g),"\",\"Closed");
+          
+          var finalStr = replaceStr6.replace(new RegExp(/,\"Desc/g),"\",\"Desc");
+          
+          var topicArr = JSON.parse(finalStr);
+          var finalArr = [];
+          for (key in topicArr) {
+            var myTopic = {};
+            myTopic.topicHash = "0x" + topicArr[key].Hash;
+            myTopic.owner = "0x" + topicArr[key].Owner;
+            myTopic.award = chain3.fromSha(topicArr[key].Award, 'mc');
+            myTopic.duration = topicArr[key].Expblk * config.packPerBlockTime;
+            finalArr.push(myTopic);
+          }
+          resolve(finalArr);
+            
+          
+        });
+      }
+    });
+
+    
+
+  });   
+}
+
+// 获取版块列表
+export var getBoardList = function () {
+  return new Promise ((resolve) => {
+    dechatmanagement.getBoardlist(1,function(err, result){
+      var boardList = [];
+      
+      var subChainAddrArr = result[0];
+      var boardNameArr = result[1];
+      var picNameArr = result[2];
+      for (key in subChainAddrArr) {
+        var board = {};
+        board.subChainAddrArr = subChainAddrArr[key];
+        boardList.push(board);
+      }
+
+      for (key in boardNameArr) {
+        for (k in boardList) {
+          if (key == k) {
+            boardList[k].boardName = chain3.toAscii(boardNameArr[key]);
+          }
+        }
+      }
+
+      for (key in picNameArr) {
+        for (k in boardList) {
+          if (key == k) {
+            boardList[k].picName = chain3.toAscii(picNameArr[key]);
+          }
+        }
+      }
+      resolve(boardList);
+    });
+  });   
 }
 
 function converHex(intValue) {   // 确保返回的是两位，单个的前面加0

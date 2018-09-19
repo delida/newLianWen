@@ -8,6 +8,9 @@ contract DeChatManagement {
     
 	struct BoardInfo {
         address subchainAddr;
+        address deployLwSolAdmin;
+        address marketableTokenAddr;
+        bytes32 rpcIp;
         bytes32 boardName;
         bytes32 picPath;
         uint boardStatus;
@@ -20,12 +23,12 @@ contract DeChatManagement {
 		owner = msg.sender;
 	}
 	
-	function creatBoard(address subchainAddr, bytes32 boardName, bytes32 picPath) public {
+	function creatBoard(address subchainAddr, address deployLwSolAdmin, address marketableTokenAddr, bytes32 rpcIp, bytes32 boardName, bytes32 picPath) public {
 	    require(owner == msg.sender);
-        boardList.push(BoardInfo(subchainAddr, boardName, picPath, uint(BoardStatus.working)));
+        boardList.push(BoardInfo(subchainAddr, deployLwSolAdmin, marketableTokenAddr, rpcIp, boardName, picPath, uint(BoardStatus.working)));
     }
     
-    function getBoardlist(uint status) public constant returns (address[] , bytes32[] , bytes32[] , uint[] ) {
+    function getBoardlist(uint status) public constant returns (address[], bytes32[], uint[]) {
         uint i;
         uint j = 0;
         for (i = 0; i < boardList.length; i++) {
@@ -34,21 +37,23 @@ contract DeChatManagement {
             }
         }
         
-        address[] memory subchainAddrlist = new address[](j);
-        bytes32[] memory boardNamelist = new bytes32[](j);
-        bytes32[] memory picPathlist = new bytes32[](j);
+        address[] memory addrlist = new address[](j*3);
+        bytes32[] memory byteslist = new bytes32[](j*3);
         uint[] memory boardStatuslist = new uint[](j);
         j = 0;
         for (i = 0; i < boardList.length; i++) {
             if(boardList[i].boardStatus == status) {
-                subchainAddrlist[j] = boardList[i].subchainAddr;
-                boardNamelist[j] = boardList[i].boardName;
-                picPathlist[j] = boardList[i].picPath;
+                addrlist[j*3] = boardList[i].subchainAddr;
+                addrlist[j*3+1] = boardList[i].deployLwSolAdmin;
+                addrlist[j*3+2] = boardList[i].marketableTokenAddr;
+                byteslist[j*3] = boardList[i].rpcIp;
+                byteslist[j*3+1] = boardList[i].boardName;
+                byteslist[j*3+2] = boardList[i].picPath;
                 boardStatuslist[j] = boardList[i].boardStatus;
                 j++;
             }
         }
-        return (subchainAddrlist, boardNamelist, picPathlist, boardStatuslist);
+        return (addrlist, byteslist, boardStatuslist);
     }
     
     function updateBoardStatus(uint status, address subchainAddr) public {

@@ -1,5 +1,6 @@
 import secp256k1 from 'secp256k1';
 import keccak from 'keccak';
+import {_post} from "./HttpFecth"
 //import {encrypt} from "./accounts"
 import {decrypt} from "./accounts"
 import {testbuyMintToken} from "./scAccount"
@@ -7,6 +8,8 @@ import {testrequestEnterMicrochain} from "./scAccount"
 import {dappredeemFromMicroChain} from "./scAccount"
 import {testsellMintToken} from "./scAccount"
 import {getMicroChainBalance} from "./bussApi"
+
+//import crypto from 'crypto-browserify';
 
 import config from "./lwconfig.json"
 import assert from "assert"
@@ -55,11 +58,40 @@ const Hexstring2btye = (str)=> {
     }
     return hexA;
 }
+
+export var getContractInfo = function(rpcIp, methodName, postParam) {
+  
+    var data = {"jsonrpc": "2.0", "id": 0, "method": methodName, "params": postParam};
+  //   data = JSON.stringify(data);
+  // console.log(rpcIp);
+  // console.log(data)
+    return new Promise(function(resolve, reject){
+        _post(rpcIp, data).then((datas) => {
+            //console.log("datas---------" + JSON.stringify(datas))
+            var rpcResult;
+            //console.log(datas.result);
+            if (datas.result == undefined) {
+                rpcResult == "have exception";
+            }
+            else if (datas.result.Storage == undefined) {
+                rpcResult = datas.result;
+            } else{
+                rpcResult = datas.result.Storage;
+            }
+            
+		    resolve(rpcResult);
+        }); 
+
+    });
+     
+};
+
+
 ///////测试提交
 // 创建账户 (scripts环境不可用)
 export function registerUser(pwd) {
 	var registerInfo = {};
-	var privateKey = new Buffer("7e2e56890c4af2e65c400eb23d5e5e4ce60eb328ba27f1dd8c207a013b716d75", 'hex');//crypto.randomBytes(32)
+	var privateKey = crypto.randomBytes(32);//new Buffer("7e2e56890c4af2e65c400eb23d5e5e4ce60eb328ba27f1dd8c207a013b716d75", 'hex');//
 	
 	
 	var publicKey = secp256k1.publicKeyCreate(privateKey, false).slice(1);
@@ -83,13 +115,10 @@ export function registerUser(pwd) {
 // 3 pwd和keystore解析出来私钥，地址，对比地址和输入地址是否一致
 export function loginUser(addr, pwd, keystore) {
 	try {
-		console.log(11111111111);
+		
 		var keystoreObj = JSON.parse(keystore);
-		console.log(22222);
+		
 		var address = decrypt(keystoreObj, pwd).address + '';
-		console.log(333333);
-		console.log(address);
-		console.log(addr);
 		if (address.toLowerCase() == addr.toLowerCase()) {
 			return 1
 		} else {
@@ -99,6 +128,7 @@ export function loginUser(addr, pwd, keystore) {
 		if (e.message == "Key derivation failed - possibly wrong password") {
 			return 2; // 密码错误
 		} else {
+			console.log(e);
 			return 0;  // 登录失败
 		}
 		
@@ -131,12 +161,16 @@ export var getBalance = function (userAddr, marketableTokenAddr) {
 
 
 // 充值（moac兑换主链token, 然后充值进子链）
-export var chargeToken = function (userAddr, value, marketableTokenAddr, pwd, keystore) {
+export var chargeToken = function (userAddr, value, marketableTokenAddr, pwd, keystore, subChainAddr) {
+
+	
+
 	return new Promise((resolve, reject) => {
+		var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
 		try {
 			getBalance(userAddr, marketableTokenAddr).then((balance1) => {    // 查询当前erc20余额
 				console.log("充值兑换前---------" + JSON.stringify(balance1));
-				testbuyMintToken(userAddr, pwd, value); // moac兑换主链erc20
+				testbuyMintToken(userAddr, pwd, value,privatekey, subChainAddr); // moac兑换主链erc20
 
 				var interval = setInterval(function(){
 					console.log("wait for buyToken-----");
@@ -144,7 +178,7 @@ export var chargeToken = function (userAddr, value, marketableTokenAddr, pwd, ke
 						if(balance1.erc20Balance != balance2.erc20Balance){   // 每3s执行一次查询是否兑换成功
 							console.log("充值兑换后---------" + JSON.stringify(balance2));
 							console.log("开始子链充值-----");
-							testrequestEnterMicrochain(userAddr, pwd, chain3.toSha(value, 'mc'));  // 兑换成功则执行子链充值，并跳出interval
+							testrequestEnterMicrochain(userAddr, pwd, chain3.toSha(value, 'mc'), privatekey, subChainAddr);  // 兑换成功则执行子链充值，并跳出interval
 							clearInterval(interval);
 							resolve(1);
 						}
@@ -165,32 +199,38 @@ export var buyToken = function (userAddr, value) {
 
 
 // 提币
-export var redeemToken = function (userAddr, value, marketableTokenAddr, pwd, keystore) {
+export var redeemToken = function (userAddr, value, marketableTokenAddr, pwd, keystore, subChainAddr, rpcIp) {
 	return new Promise((resolve, reject) => {
-	try {
-		getBalance(userAddr, marketableTokenAddr).then((balance1) => {    // 查询当前erc20余额
-			console.log("提币前主链代币---------" + JSON.stringify(balance1));
-			dappredeemFromMicroChain(userAddr, pwd, chain3.toSha(value, 'mc')).then((data) => {   // 提币
-				var interval = setInterval(function(){
-					console.log("wait for redeemToken-----");
-					getBalance(userAddr, marketableTokenAddr).then((balance2) => {    // 查询当前erc20余额
-						
-						if(balance1.erc20Balance != balance2.erc20Balance){   // 每3s执行一次查询是否兑换成功
-							console.log("提币后主链代币---------" + JSON.stringify(balance2));
-							console.log("提币成功，开始兑换moac-----");
-							testsellMintToken(userAddr, pwd, chain3.toSha(value, 'mc'));  // 提币成功则执行moac兑换，并跳出interval
-							clearInterval(interval);
-							resolve(1);
-						}
-					});	
-				}, 30000);
-			});
-		});
+		var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
+		try {
+			getBalance(userAddr, marketableTokenAddr).then((balance1) => {    // 查询当前erc20余额
+				console.log("提币前主链代币---------" + JSON.stringify(balance1));
+			var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr};
+      
+     		 getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam).then(function(nonce){
+				dappredeemFromMicroChain(userAddr, pwd, chain3.toSha(value, 'mc'), nonce, privatekey, subChainAddr).then((data) => {   // 提币
+					var interval = setInterval(function () {
+						console.log("wait for redeemToken-----");
+						getBalance(userAddr, marketableTokenAddr).then((balance2) => {    // 查询当前erc20余额
 
-	}catch (e) {
-		console.log("提币报错--------" + e);
-		reject(0);
-	}
-});
+							if (balance1.erc20Balance != balance2.erc20Balance) {   // 每3s执行一次查询是否兑换成功
+								console.log("提币后主链代币---------" + JSON.stringify(balance2));
+								console.log("提币成功，开始兑换moac-----");
+								testsellMintToken(userAddr, pwd, chain3.toSha(value, 'mc'), privatekey, subChainAddr);  // 提币成功则执行moac兑换，并跳出interval
+								clearInterval(interval);
+								resolve(1);
+							}
+						});
+					}, 30000);
+				});
+
+			});
+			});
+
+		} catch (e) {
+			console.log("提币报错--------" + e);
+			reject(0);
+		}
+	});
 	
 }

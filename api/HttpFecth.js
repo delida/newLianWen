@@ -53,5 +53,5 @@ export const checkStatus = response => {
 const handleFetch = promise => {
     return promise
         .then(response => checkStatus(response))
-        .catch(() => dispatch(error(FAIL_RESULT.message)))
+        .catch((e) => console.log(e))
 };

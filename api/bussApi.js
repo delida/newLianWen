@@ -1,6 +1,7 @@
 import config from './lwconfig';
 
 import {_post} from "./HttpFecth"
+import {decrypt} from "./accounts"
 import {createTopicSol} from "./subchainclient.js"
 import {createSubTopicSol} from "./subchainclient.js"
 import {voteOnTopic} from "./subchainclient.js"
@@ -88,22 +89,18 @@ function sleep(d){
 
 // 创建问题    yes
 export var createTopic = function (award, desc, duration, userAddr, pwd, keystore, subChainAddr, rpcIp) {
-  
   return new Promise((resolve, reject) => {
+    var privatekey = decrypt(keystore, pwd).privateKey + "";//"0xb15132deb02906c665debda4905f6dc4cd82ddcb31436486bf0881303b5f7cba"
     try{
     var result = {};
     
       var postParam1 = {"SubChainAddr": subChainAddr, "Sender": userAddr};
-      // _post(url, postParam1).then((datas) => {
-          //     console.log(datas.result);
 
-          // })
       getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam1).then(function(nonce){
               
         // 创建问题
         
-        createTopicSol(userAddr, pwd, award, duration, desc, subChainAddr, nonce);
-        
+        createTopicSol(userAddr, pwd, award, duration, desc, subChainAddr, nonce, privatekey);
               
         // 获取hash
         var postParam2 = {
@@ -116,11 +113,11 @@ export var createTopic = function (award, desc, duration, userAddr, pwd, keystor
         // sleep((packPerBlockTime + 3) * 1000);
 
         t = Date.now();
-        sleep((packPerBlockTime + 2) * 1000);
+        sleep((packPerBlockTime + 3) * 1000);
         
         getContractInfo(rpcIp, "ScsRPCMethod.GetTxRlt", postParam2).then(function(topicHash){
-          
-              result.topicHash = "0x" + topicHash;
+              //console.log(topicHash);
+              result.topicHash = "";
               result.isSuccess = 1;
               resolve(result);
         });
@@ -141,7 +138,7 @@ export var createTopic = function (award, desc, duration, userAddr, pwd, keystor
 
 // 问题列表   yes
 // 1 获取个数  2 循环查找mapping下标  3 根据下标查找topic   4 组装list返回	
-export var getTopicList = function (pageNum, pageSize, pwd, keystore, subChainAddr, rpcIp) {
+export var getTopicList = function (pageNum, pageSize, subChainAddr, rpcIp) {
 	// 先获取个数
   return new Promise((resolve, reject) => {
     // 获取topic个数
@@ -162,7 +159,7 @@ export var getTopicList = function (pageNum, pageSize, pwd, keystore, subChainAd
     ).then((allInfoResult) => {
       var topicNum = allInfoResult["000000000000000000000000000000000000000000000000000000000000000a"];
       topicNum = parseInt(topicNum, 16);
-      //console.log("topic个数是：-------" + parseInt(topicNum, 16));
+      console.log("topic个数是：-------" + parseInt(topicNum, 16));
       
       // 获取topic mapping 下标
       var topicArr = [];
@@ -205,21 +202,24 @@ export var getTopicList = function (pageNum, pageSize, pwd, keystore, subChainAd
             	//console.log(topicResult);
             	var topic = {};
             	var str = chain3.sha3(key + topicIndex, {"encoding": "hex"}).substring(2);
-            	var prefixStr = str.substring(0, str.length - 2);
-            	var suffixStr = str.substring(str.length - 2, str.length);
+            	var prefixStr = str.substring(0, str.length - 3);
+            	var suffixStr = str.substring(str.length - 3, str.length);
             	var suffixInt = parseInt(suffixStr, 16);
               
               var topicHash = '0x' + key;
              
               var owner = '0x' + topicResult[prefixStr + converHex(suffixInt + 1)];
               
-            	var award = topicResult[prefixStr + converHex(suffixInt + 3)]; 
+              
+              var award = topicResult[prefixStr + converHex(suffixInt + 3)]; 
+              if (award == undefined) {
+                 console.log();
+              }
             	var duration = parseInt(topicResult[prefixStr + converHex(suffixInt + 4)], 16) * packPerBlockTime
             	
             	topic.topicHash = topicHash; 
               topic.owner = owner; 
               //console.log(topicHash + "--------" + award);
-
             	topic.award = chain3.toDecimal('0x' + award.substring(2)) / Math.pow(10, decimals);;
             	topic.duration = duration;
             	
@@ -229,8 +229,8 @@ export var getTopicList = function (pageNum, pageSize, pwd, keystore, subChainAd
             		  // 长string, 这里代表长度，需要连接
                   var descStr = chain3.sha3(prefixStr + converHex(suffixInt + 2), 
                   {"encoding": "hex"}).substring(2);  // 再做一次hash获取字符串第一部分的key
-                  var prefixStr = descStr.substring(0, descStr.length - 2);
-                  var suffixStr = descStr.substring(descStr.length - 2, descStr.length);
+                  var prefixStr = descStr.substring(0, descStr.length - 3);
+                  var suffixStr = descStr.substring(descStr.length - 3, descStr.length);
                   var suffixInt = parseInt(suffixStr, 16);
                   //var owner = topicResult[prefixStr + converHex(suffixInt + 1)]; 
                   var valueArr = [];
@@ -286,6 +286,7 @@ export var createSubTopic = function (topicHash, desc, userAddr, pwd, keystore, 
 
   var result = {};
   return new Promise((resolve, reject) => {
+    var privatekey = decrypt(keystore, pwd).privateKey + "";
 	try {
 		var postParam1 = {"SubChainAddr": subChainAddr, "Sender": userAddr};
 		// _post(url, postParam1).then((datas) => {
@@ -295,7 +296,7 @@ export var createSubTopic = function (topicHash, desc, userAddr, pwd, keystore, 
 		getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam1).then(function(nonce){
 			
         // 创建回答
-        createSubTopicSol(userAddr, pwd, desc, subChainAddr, topicHash, nonce);
+        createSubTopicSol(userAddr, pwd, desc, subChainAddr, topicHash, nonce, privatekey);
         // 获取hash
         var postParam2 = {
             "SubChainAddr": subChainAddr,
@@ -306,7 +307,7 @@ export var createSubTopic = function (topicHash, desc, userAddr, pwd, keystore, 
         sleep((packPerBlockTime + 2) * 1000);
         getContractInfo(rpcIp, "ScsRPCMethod.GetTxRlt", postParam2).then(function(subTopicHash){
           //console.log("0x" + subTopicHash);
-          result.subTopicHash = "0x" + subTopicHash;
+          result.subTopicHash = "";
           result.isSuccess = 1;
           resolve(result);
         });
@@ -325,7 +326,7 @@ export var createSubTopic = function (topicHash, desc, userAddr, pwd, keystore, 
 
 // 回答列表  (返回subTopicHash, desc, owner, voteCount)
 //1 根据topicHash，查找回答hash数组  2 遍历获取到下标，根据下标查找所有回答
-export var getSubTopicList = function (topicHash, pageNum, pageSize, pwd, keystore, subChainAddr, rpcIp) {
+export var getSubTopicList = function (topicHash, pageNum, pageSize, subChainAddr, rpcIp) {
   // 根据topicHash，查找回答hash数组
 	return new Promise((resolve) => { 
 	var topicHashByte = Hexstring2btye(topicHash.substring(2));
@@ -373,8 +374,8 @@ export var getSubTopicList = function (topicHash, pageNum, pageSize, pwd, keysto
 			        	var subTopic = {};
 			        	
 		            	var str = chain3.sha3(key + subTopicIndex, {"encoding": "hex"}).substring(2);
-		            	var prefixStr = str.substring(0, str.length - 2);
-		            	var suffixStr = str.substring(str.length - 2, str.length);
+		            	var prefixStr = str.substring(0, str.length - 3);
+		            	var suffixStr = str.substring(str.length - 3, str.length);
 		            	var suffixInt = parseInt(suffixStr, 16);
 		            	
 		            	var subTopicHash = '0x' + key;
@@ -394,8 +395,8 @@ export var getSubTopicList = function (topicHash, pageNum, pageSize, pwd, keysto
 		              		  	// 长string, 这里代表长度，需要连接
 		    	                var descStr = chain3.sha3(prefixStr + converHex(suffixInt + 2), 
 		    	                {"encoding": "hex"}).substring(2);  // 再做一次hash获取字符串第一部分的key
-		    	                var prefixStr = descStr.substring(0, descStr.length - 2);
-		    	                var suffixStr = descStr.substring(descStr.length - 2, descStr.length);
+		    	                var prefixStr = descStr.substring(0, descStr.length - 3);
+		    	                var suffixStr = descStr.substring(descStr.length - 3, descStr.length);
 		    	                var suffixInt = parseInt(suffixStr, 16);
 		    	                //var owner = topicResult[prefixStr + converHex(suffixInt + 1)]; 
 		    	                var valueArr = [];
@@ -456,10 +457,10 @@ export var getMicroChainBalance = function (userAddr, pwd, keystore, subChainAdd
 
 // 点赞    yes
 export var approveSubTopic = function (voter, subTopicHash, subChainAddr, pwd, keystore, rpcIp) {
-	
+	var privatekey = decrypt(keystore, pwd).privateKey + "";
   var postParam = {"SubChainAddr": subChainAddr, "Sender": voter};
   return getContractInfo(rpcIp,"ScsRPCMethod.GetNonce", postParam).then(function(nonce){
-    voteOnTopic(voter, pwd, subChainAddr, subTopicHash, nonce);
+    voteOnTopic(voter, pwd, subChainAddr, subTopicHash, nonce,privatekey);
     return 1;
   });
 	
@@ -597,7 +598,9 @@ export var getBoardList = function () {
 function converHex(intValue) {   // 确保返回的是两位，单个的前面加0
   var res = intValue.toString(16);
   if (res.length == 1) {
-     res = "0" + res
+     res = "00" + res
+  } else if (res.length == 2) {
+    res = res = "0" + res
   }
   return res;
 }

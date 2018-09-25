@@ -83,14 +83,14 @@ export default class App extends React.Component {
     // });
 
     // 充值   yes
-    // chargeToken(config.userAddr1, 200, config.marketableTokenAddr, 
+    // chargeToken(config.userAddr1, 100, config.marketableTokenAddr, 
     //   config.pwd, keystore_youTest, config.subChainAddr).then((data) => {
-
+    //      console.log(data);
     // })
 
     // 提币    yes
-    // redeemToken(config.userAddr2, 5, config.marketableTokenAddr, config.pwd, keystore_youTest,config.subChainAddr, config.rpcIp).then((data) => {
-
+    // redeemToken(config.userAddr1, 10, config.marketableTokenAddr, config.pwd, keystore_youTest,config.subChainAddr, config.rpcIp).then((data) => {
+    //  console.log(data);
     // })
 
 
@@ -100,7 +100,7 @@ export default class App extends React.Component {
 
 
     // 创建topic  
-    // createTopic(1, "haha,this is the new qu?", 30, 
+    // createTopic(1, "are you ok", 30, 
     // config.userAddr1, config.pwd, keystore_youTest, config.subChainAddr, config.rpcIp).then((data) => {
     //   console.log(data);
     // })
@@ -116,20 +116,20 @@ export default class App extends React.Component {
     // 0x2ae964d3f6e550e335fa662c92f39b6b55aed8a5c02af954aac1a63a473bec2f
     // 
     // 
-    // createSubTopic("0x2f00f67372d014c3809fb184416214a0163af864edc5e1fed5263545dd61abda", 
+    // createSubTopic("0xda7d2be5c2aa7226bb9dc41b30af2b68a045f485ff61f849b64ca40a7fbc3f67", 
     //   "it is good", config.userAddr1, config.pwd, keystore_youTest, config.subChainAddr, config.rpcIp).then((data) => {
     //   console.log(data);
     // });
 
-    // 点赞     yes
+    // 点赞     yes    0xcf9238d5e7d141680ae83aae4d9042889a6307797d23a477055f70386b181fcb
     //  approveSubTopic(config.userAddr1, 
-    //    "0xcf9238d5e7d141680ae83aae4d9042889a6307797d23a477055f70386b181fcb", config.subChainAddr,
+    //    "0x84c1926cc0a2207354e72792fb45efe40d089b9898929092c5ff6e8fd06b3496", config.subChainAddr,
     // config.pwd, keystore_youTest, config.rpcIp).then((data) => {
     //     console.log(data);
     //    });
 
     // 回答列表(暂未做分页)    yes
-    // getSubTopicList("0x2f00f67372d014c3809fb184416214a0163af864edc5e1fed5263545dd61abda",
+    // getSubTopicList("0xda7d2be5c2aa7226bb9dc41b30af2b68a045f485ff61f849b64ca40a7fbc3f67",
     //      0,0, config.subChainAddr,config.rpcIp).then((data) => {
     //        console.log(data);
     // });
@@ -140,7 +140,8 @@ export default class App extends React.Component {
     // });
 
     // autoCheck
-    // autoCheck(userAddr, config.pwd, "", config.subChainAddr, config.rpcIp).then((data) => {
+    // autoCheck(config.userAddr1, config.pwd, keystore_youTest, config.subChainAddr, config.rpcIp).then((data) => {
+    //  console.log(data);
     //   this.setState({r:data});
     // });
 
@@ -150,7 +151,7 @@ export default class App extends React.Component {
     // });
 
     // 我的链问列表    yes
-    // myTopicList(config.userAddr1, config.subChainAddr, config.pwd, "", 
+    // myTopicList(config.userAddr1, config.subChainAddr, config.pwd, keystore_youTest, 
     //   config.rpcIp, config.deployLwSolAdmin).then((data) => {
     //   console.log(data);
     // });

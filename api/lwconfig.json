@@ -1,7 +1,7 @@
 {
-    "subChainAddr": "0xe98f7ae591095f9f41279f68bdbb3f10ee8cd380",
+    "subChainAddr": "0x72312b90769fd0d5e047cab16512b8bd9ff59995",
     "deployLwSolAdmin":"0xcc125e6f0795ef475bf59abb826c8a4cd6a892e7",
-    "marketableTokenAddr":"0x1e1834cdd446f1f1b2549a84ee4615fead4796b6",
+    "marketableTokenAddr":"0x52692fc3d192510d742f35ebf835be062b87d227",
     "rpcIp": "http://119.23.27.43:8549/rpc",
 
 

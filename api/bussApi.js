@@ -457,7 +457,8 @@ export var getMicroChainBalance = function (userAddr, pwd, keystore, subChainAdd
 
 // 点赞    yes
 export var approveSubTopic = function (voter, subTopicHash, subChainAddr, pwd, keystore, rpcIp) {
-	var privatekey = decrypt(keystore, pwd).privateKey + "";
+  var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
+  console.log(privatekey);
   var postParam = {"SubChainAddr": subChainAddr, "Sender": voter};
   return getContractInfo(rpcIp,"ScsRPCMethod.GetNonce", postParam).then(function(nonce){
     voteOnTopic(voter, pwd, subChainAddr, subTopicHash, nonce,privatekey);
@@ -468,9 +469,10 @@ export var approveSubTopic = function (voter, subTopicHash, subChainAddr, pwd, k
 
 // autoCheck
 export var autoCheck = function (userAddr, pwd, keystore, subChainAddr, rpcIp) {
+  var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
 	var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr};
 	return getContractInfo(rpcIp,"ScsRPCMethod.GetNonce", postParam).then(function(nonce){
-    autoCheckSol(subChainAddr, nonce);
+    autoCheckSol(userAddr, pwd, subChainAddr, nonce, privatekey);
     return 1;
 	});
 }
@@ -497,16 +499,18 @@ export var myTopicList = function (userAddr, subChainAddr, pwd,
         };
         getContractInfo(rpcIp,"ScsRPCMethod.AnyCall", postParam3).then(function(topicList){
           
-          var replaceStr1 = topicList.replace(new RegExp(/\"Hash\":/g),"\"Hash\":\"");
-          var replaceStr2 = replaceStr1.replace(new RegExp(/,\"Owner\":/g),"\",\"Owner\":");
-          var replaceStr3 = replaceStr2.replace(new RegExp(/Owner\":/g),"Owner\":\"");
-          var replaceStr4 = replaceStr3.replace(new RegExp(/BestHash\":/g),"BestHash\":\"");
-          var replaceStr5 = replaceStr4.replace(new RegExp(/,\"SecondBestVote/g),"\",\"SecondBestVote");
-          var replaceStr6 = replaceStr5.replace(new RegExp(/,\"Closed/g),"\",\"Closed");
+          // var replaceStr1 = topicList.replace(new RegExp(/\"Hash\":/g),"\"Hash\":\"");
+          // var replaceStr2 = replaceStr1.replace(new RegExp(/,\"Owner\":/g),"\",\"Owner\":");
+          // var replaceStr3 = replaceStr2.replace(new RegExp(/Owner\":/g),"Owner\":\"");
+          // var replaceStr4 = replaceStr3.replace(new RegExp(/BestHash\":/g),"BestHash\":\"");
+          // var replaceStr5 = replaceStr4.replace(new RegExp(/,\"SecondBestVote/g),"\",\"SecondBestVote");
+          // var replaceStr6 = replaceStr5.replace(new RegExp(/,\"Closed/g),"\",\"Closed");
           
-          var finalStr = replaceStr6.replace(new RegExp(/,\"Desc/g),"\",\"Desc");
+          // var finalStr = replaceStr6.replace(new RegExp(/,\"Desc/g),"\",\"Desc");
+          console.log(topicList);
+          var topicArr = JSON.parse(topicList);
           
-          var topicArr = JSON.parse(finalStr);
+          //var topicArr = JSON.parse(topicList);
           var finalArr = [];
           for (key in topicArr) {
             var myTopic = {};

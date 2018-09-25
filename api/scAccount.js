@@ -47,13 +47,11 @@ var marketableTokenAddr = config.marketableTokenAddr;
 							resolve("success");
 						} else {
 							console.log("error:", err.message);
-							reject("success");
+							reject("fail");
 						}
 					});
 				});
 			});
-			
-			
 
 		});
 
@@ -85,8 +83,8 @@ export	function testbuyMintToken(sender, passwd, pay, privateKey, subChainAddr)
 	// 充值
 	export	function testrequestEnterMicrochain(sender, passwd, amount, privateKey, subChainAddr)
 	{
-		var data=getInstance(subChainAddr).requestEnterMicrochain.getData(amount);
-		sendtx(sender, subChainAddr, '0', data, privateKey);
+		var data = getInstance(subChainAddr).requestEnterMicrochain.getData(amount);
+		return sendtx(sender, subChainAddr, '0', data, privateKey);
 	}
 
 	// 提币
@@ -125,10 +123,11 @@ export	function testbuyMintToken(sender, passwd, pay, privateKey, subChainAddr)
 				var signedTx = chain3.signTransaction(rawTx, privateKey)
 				chain3.mc.sendRawTransaction(signedTx, function (err, hash) {
 					if (!err) {
-						console.log("succeed");
-	
+						console.log("success");
+						resolve("success");
 					} else {
-						console.log("error:", err.message);
+						console.log("fail:", err.message);
+						reject("fail");
 					}
 				});
 

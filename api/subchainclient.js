@@ -91,9 +91,9 @@ export function voteOnTopic(vote, pwd, subchainaddr,subHash, nonce, privatekey)
 	var data=deChatInstance.voteOnTopic.getData(subHash)
 	sendshardingflagtx(vote,pwd,subchainaddr,'0',data,nonce, privatekey)
 }
-export function autoCheckSol(subchainaddr, nonce, privatekey)
+export function autoCheckSol(userAddr, pwd, subchainaddr, nonce, privatekey)
 {
 	var data=deChatInstance.autoCheck.getData()
 	
-	sendshardingflagtx(baseaddr,basename,subchainaddr,'0',data,nonce, privatekey)
+	sendshardingflagtx(userAddr, pwd, subchainaddr,'0',data,nonce, privatekey)
 }

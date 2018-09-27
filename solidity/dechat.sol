@@ -156,13 +156,15 @@ contract DeChat is DappBase{
 		return hash;
 	}
 	
-	function voteOnTopic(bytes32 topichash) public {
+	function voteOnTopic(bytes32 topichash) public returns(bytes32) {
 		require(subTopics[topichash].hash != "");
 		bytes32 parenthash = subTopics[topichash].parent;
 		require(parenthash != "" );
 		//key is (topic, msg.sender)
 		bytes32 key = sha3(msg.sender, parenthash);
-		require(voteinfo[key] < 1);
+		if (voteinfo[key] >= 1){
+		    return bytes32(0);
+		}
 		//mark as voted
 		voteinfo[key] = 1;
 		//add to voters
@@ -179,7 +181,7 @@ contract DeChat is DappBase{
 			topics[parenthash].bestHash = topichash;
 			topics[parenthash].bestVoteCount = subTopics[topichash].voteCount;
 			updateMyTopic(topics[parenthash]);
-			return;
+			return key;
 		}
 
 		if( subTopics[topichash].voteCount > topics[parenthash].secondBestVoteCount ) {
@@ -187,8 +189,10 @@ contract DeChat is DappBase{
 			topics[parenthash].secondBestHash = topichash;
 			topics[parenthash].secondBestVoteCount = subTopics[topichash].voteCount;
 			updateMyTopic(topics[parenthash]);
-			return;
+			return key;
 		}
+		
+		return key;
 	}
 	
 	function creatSubTopic(bytes32 parenthash, string desc) public payable returns (bytes32) {
@@ -206,11 +210,10 @@ contract DeChat is DappBase{
 	
 	function updateMyTopic(topic t) private{
 		require(t.owner != address(0));
-		
-		topic[] tl = myTopics[t.owner];		
-        for (uint i=0; i < tl.length; i++) {
-			if (t.owner == tl[i].owner) {
-				tl[i] = t;
+			
+        for (uint i=0; i < myTopics[t.owner].length; i++) {
+			if (t.owner == myTopics[t.owner][i].owner && t.hash == myTopics[t.owner][i].hash) {
+				myTopics[t.owner][i] = t;
 			}
 		}
 	}

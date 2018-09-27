@@ -67,7 +67,14 @@ export var getContractInfo = function(rpcIp, methodName, postParam) {
             var rpcResult;
             //console.log(datas.result);
             if (datas.result == undefined) {
-                rpcResult == "have exception";
+                if (datas.error != undefined && datas.error.code == -32000) {
+                  // pending
+                  rpcResult = "pending";
+                } else {
+                  rpcResult == "have exception";
+                }
+                
+                
             }
             else if (datas.result.Storage == undefined) {
                 rpcResult = datas.result;
@@ -91,45 +98,54 @@ function sleep(d){
 export var createTopic = function (award, desc, duration, userAddr, pwd, keystore, subChainAddr, rpcIp) {
   return new Promise((resolve, reject) => {
     
-    var privatekey = decrypt(keystore, pwd).privateKey + "";//"0xb15132deb02906c665debda4905f6dc4cd82ddcb31436486bf0881303b5f7cba"
+    var privatekey = decrypt(keystore, pwd).privateKey + "";
     try{
     var result = {};
     
-      var postParam1 = {"SubChainAddr": subChainAddr, "Sender": userAddr};
-
-      getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam1).then(function(nonce){
+      
+      var nonce = currentNonce();
+      createTopicSol(userAddr, pwd, award, duration / config.packPerBlockTime, desc, subChainAddr, nonce, privatekey);
               
-        // 创建问题
-        
-        createTopicSol(userAddr, pwd, award, duration / config.packPerBlockTime, desc, subChainAddr, nonce, privatekey);
+      result.topicHash = "";
+      result.isSuccess = 1;
+      result.nonce = nonce;
+      resolve(result);
+      // var postParam1 = {"SubChainAddr": subChainAddr, "Sender": userAddr};
+      // getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam1).then(function(nonce){
               
-        // 获取hash
-        var postParam2 = {
-            "SubChainAddr": subChainAddr,
-            "Sender": userAddr, 
-            "nonce": nonce
-        };
-        // 十秒打包区块，返回hash
-        // t = Date.now();
-        // sleep((packPerBlockTime + 3) * 1000);
-
-        t = Date.now();
-        sleep((packPerBlockTime + 3) * 1000);
+      //   // 创建问题
         
-        getContractInfo(rpcIp, "ScsRPCMethod.GetTxRlt", postParam2).then(function(topicHash){
-              //console.log(topicHash);
-              result.topicHash = "";
-              result.isSuccess = 1;
-              resolve(result);
-        });
+      //   createTopicSol(userAddr, pwd, award, duration / config.packPerBlockTime, desc, subChainAddr, nonce, privatekey);
+              
+      //   result.topicHash = "";
+      //   result.isSuccess = 1;
+      //   resolve(result);
+
+      //   // 获取hash
+      //   // var postParam2 = {
+      //   //     "SubChainAddr": subChainAddr,
+      //   //     "Sender": userAddr, 
+      //   //     "nonce": nonce
+      //   // };
+
+      //   // t = Date.now();
+      //   // sleep((packPerBlockTime + 3) * 1000);
+        
+      //   // getContractInfo(rpcIp, "ScsRPCMethod.GetTxRlt", postParam2).then(function(topicHash){
+      //   //       //console.log(topicHash);
+      //   //       result.topicHash = "";
+      //   //       result.isSuccess = 1;
+      //   //       resolve(result);
+      //   // });
       
         
-      });
+      // });
     } catch (e) {
       console.log("创建问题时发生异常-----" + e);
       result.topicHash = "";
       result.isSuccess = 0;
-      reject(result);
+      result.nonce = -1;
+      resolve(result);
     }
   });
   
@@ -316,43 +332,53 @@ export var createSubTopic = function (topicHash, desc, userAddr, pwd, keystore, 
     
     checkTime (subChainAddr, topicHash,rpcIp,topicIndex).then ((data) => {
       if (data == 0) {
-        resolve(0);  // 问题已经过期
+        result.subTopicHash = "";
+        result.isSuccess = 2;  // 问题已经过期
+        resolve(result);  
       } 
 
 
 
     var privatekey = decrypt(keystore, pwd).privateKey + "";
 	try {
-		var postParam1 = {"SubChainAddr": subChainAddr, "Sender": userAddr};
-		// _post(url, postParam1).then((datas) => {
-        //     console.log(datas.result);
 
-        // })
-		getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam1).then(function(nonce){
+    var nonce = currentNonce();
+    createSubTopicSol(userAddr, pwd, desc, subChainAddr, topicHash, nonce, privatekey);
+    result.subTopicHash = "";
+    result.isSuccess = 1;
+    result.nonce = nonce;
+    resolve(result);
+
+		// var postParam1 = {"SubChainAddr": subChainAddr, "Sender": userAddr};
+		// getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam1).then(function(nonce){
 			
-        // 创建回答
-        createSubTopicSol(userAddr, pwd, desc, subChainAddr, topicHash, nonce, privatekey);
-        // 获取hash
-        var postParam2 = {
-            "SubChainAddr": subChainAddr,
-            "Sender": userAddr, 
-            "nonce": nonce
-        };
-        t = Date.now();
-        sleep((packPerBlockTime + 2) * 1000);
-        getContractInfo(rpcIp, "ScsRPCMethod.GetTxRlt", postParam2).then(function(subTopicHash){
-          //console.log("0x" + subTopicHash);
-          result.subTopicHash = "";
-          result.isSuccess = 1;
-          resolve(result);
-        });
+    //     // 创建回答
+    //     createSubTopicSol(userAddr, pwd, desc, subChainAddr, topicHash, nonce, privatekey);
+    //     result.subTopicHash = "";
+    //     result.isSuccess = 1;
+    //     resolve(result);
+    //     // // 获取hash
+    //     // var postParam2 = {
+    //     //     "SubChainAddr": subChainAddr,
+    //     //     "Sender": userAddr, 
+    //     //     "nonce": nonce
+    //     // };
+    //     // t = Date.now();
+    //     // sleep((packPerBlockTime + 2) * 1000);
+    //     // getContractInfo(rpcIp, "ScsRPCMethod.GetTxRlt", postParam2).then(function(subTopicHash){
+    //     //   //console.log("0x" + subTopicHash);
+    //     //   result.subTopicHash = "";
+    //     //   result.isSuccess = 1;
+    //     //   resolve(result);
+    //     // });
 			
-		});
+		// });
 	} catch (e) {
     console.log("创建回答发生异常------" + e);
     result.subTopicHash = "";
     result.isSuccess = 0;
-    reject(result);
+    result.nonce = -1;
+    resolve(result);
   }
 });
 });
@@ -365,11 +391,13 @@ export var createSubTopic = function (topicHash, desc, userAddr, pwd, keystore, 
 //1 根据topicHash，查找回答hash数组  2 遍历获取到下标，根据下标查找所有回答
 export var getSubTopicList = function (topicHash, pageNum, pageSize, subChainAddr, rpcIp) {
   // 校验问题是否过期
-  
+  var result = {};
 	return new Promise((resolve) => { 
     checkTime (subChainAddr, topicHash,rpcIp,topicIndex).then ((data) => {
       if (data == 0) {
-        resolve(0);  // 问题已经过期
+        result.isEnable = 0;
+        result.subTopicList = [];
+        resolve(result);  // 问题已经过期
       } else {
         var topicHashByte = Hexstring2btye(topicHash.substring(2));
 	var postParam1 = {"SubChainAddr": subChainAddr,
@@ -474,7 +502,9 @@ export var getSubTopicList = function (topicHash, pageNum, pageSize, subChainAdd
 		                	subTopicArr.push(subTopic);
 		    	            flag++;
 		    	            if (flag == countFlag) {
-		    	        		resolve(subTopicArr);
+                        result.isEnable = 1;
+                        result.subTopicList = subTopicArr;
+		    	        		resolve(result);
 		    	        	//	return subTopicArr
 		    	        	}
 		            	} else {
@@ -506,24 +536,41 @@ export var getMicroChainBalance = function (userAddr, pwd, keystore, subChainAdd
 
 // 点赞    yes
 export var approveSubTopic = function (voter, subTopicHash, subChainAddr, pwd, keystore, rpcIp) {
-  var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
-  console.log(privatekey);
-  var postParam = {"SubChainAddr": subChainAddr, "Sender": voter};
-  return getContractInfo(rpcIp,"ScsRPCMethod.GetNonce", postParam).then(function(nonce){
-    voteOnTopic(voter, pwd, subChainAddr, subTopicHash, nonce,privatekey);
-    return 1;
-  });
+  var result = {};
+  try {
+    var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
+    // var postParam = {"SubChainAddr": subChainAddr, "Sender": voter};
+    // return getContractInfo(rpcIp,"ScsRPCMethod.GetNonce", postParam).then(function(nonce){
+    //   voteOnTopic(voter, pwd, subChainAddr, subTopicHash, nonce,privatekey);
+    //   return 1;
+    // });
+    var nonce = currentNonce();
+    console.log(333333);
+    voteOnTopic(voter, pwd, subChainAddr, subTopicHash, nonce, privatekey);
+    console.log(11111);
+    result.isSuccess = 1;
+    result.nonce = nonce;
+    console.log(22222);
+  } catch (e) {
+    console.log("点赞报错--------" + e);
+    result.isSuccess = 0;
+    result.nonce = -1;
+  }
+  return result;
 	
 }
 
 // autoCheck
 export var autoCheck = function (userAddr, pwd, keystore, subChainAddr, rpcIp) {
   var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
-	var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr};
-	return getContractInfo(rpcIp,"ScsRPCMethod.GetNonce", postParam).then(function(nonce){
-    autoCheckSol(userAddr, pwd, subChainAddr, nonce, privatekey);
-    return 1;
-	});
+	// var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr};
+	// return getContractInfo(rpcIp,"ScsRPCMethod.GetNonce", postParam).then(function(nonce){
+  //   autoCheckSol(userAddr, pwd, subChainAddr, nonce, privatekey);
+  //   return 1;
+  // });
+  var nonce = currentNonce();
+  autoCheckSol(userAddr, pwd, subChainAddr, nonce, privatekey);
+  return 1;
 }
 
 // 我的链问列表
@@ -741,4 +788,48 @@ function checkTime (subChainAddr, topicHash,rpcIp,topicIndex ) {
     })
   });
     
+}
+
+
+var myNonce = 0;
+// 登录成功，设置全局nonce
+export var setNonce = function (subChainAddr, userAddr, rpcIp) {
+    return new Promise ((resolve) => {
+      try {
+        var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr};
+        getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam).then(function(nonce){
+          //console.log("start---------" + nonce);
+          myNonce = nonce;
+          resolve(1);
+        });
+      } catch (e) {
+        console.log("-----------" + e);
+        resolve(0);
+      }
+      
+    });
+} 
+
+// 通用累加器(登陆成功后查询到当前的nonce，返回之后再加一，myNonce中的值是当前nonce的值，类似rpc getNonce)
+export var currentNonce = function () {
+  //myNonce = myNonce + 1;
+  return myNonce++;
+}
+
+// 根据nonce获取操作结果（针对提问，回答，点赞）
+export var getResult = function (subChainAddr, userAddr, nonce, rpcIp){
+  return new Promise ((resolve) => {
+      var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr, "nonce":nonce};
+      getContractInfo(rpcIp, "ScsRPCMethod.GetTxRlt", postParam).then(function(result){
+          var flag = 1;  // 成功
+          if (result == "pending") {
+            flag = 2;   // 处理中
+          } else if (result == "0000000000000000000000000000000000000000000000000000000000000000") {
+            flag = 0;   // 失败
+          }
+          resolve(flag);
+      })
+  });
+  
+
 }

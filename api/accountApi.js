@@ -120,6 +120,7 @@ export function loginUser(addr, pwd, keystore) {
 		
 		var address = decrypt(keystoreObj, pwd).address + '';
 		if (address.toLowerCase() == addr.toLowerCase()) {
+
 			return 1
 		} else {
 			return 0;  // 登录失败
@@ -266,3 +267,13 @@ function redeemTimer(userAddr, pwd, value, privatekey, subChainAddr, marketableT
 		});
 	}, 180000);
 }
+
+// var myNonce = 0;
+// // 登录成功，调用获取当前nonce
+// export var currentNonce = function (subChainAddr, userAddr) {
+// 	var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr};
+// 	getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam).then(function(nonce){
+// 		myNonce = nonce;
+// 	});
+// } 
+

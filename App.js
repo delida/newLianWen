@@ -29,6 +29,8 @@ var keystore_myTest = "{\"version\":3,\"id\":\"91b62e72-d454-46f9-8382-686864309
 
 var keystore_youTest = "{\"version\":3,\"id\":\"7ce8fb55-264b-4ba0-89cd-97840ca7bc4f\",\"address\":\"e7e52b94e9a82351302260ec39a300e9f00aee4c\",\"crypto\":{\"ciphertext\":\"6b8c6d2aa87cc3fff5cae9a984bf89f8b1b0307a6c796b65616371de7c1e558c\",\"cipherparams\":{\"iv\":\"f664b90fae01d8984072e65bd7e0b6e7\"},\"cipher\":\"aes-128-ctr\",\"kdf\":\"scrypt\",\"kdfparams\":{\"dklen\":32,\"salt\":\"d3804059e4d6b809f0a9e1b9a1562153d544f2586580374a9120f061695b6c33\",\"n\":8192,\"r\":8,\"p\":1},\"mac\":\"e426a88e8bf9e47b8ad2eee53d835d99b510c159972c4afd8dc43d8be481b39a\"}}";
 
+var keystore_test1 = "{\"userAddr\":\"0x8bf33c7bceee4f04368e6f076d87dc78545b1564\",\"keystore\":{\"version\":3,\"id\":\"1842b7ca-ecba-4f26-a900-e0e425e06641\",\"address\":\"8bf33c7bceee4f04368e6f076d87dc78545b1564\",\"crypto\":{\"ciphertext\":\"475835968f3f3ddfb31e550a053163f2c2a7056855c64e4c3194bddf25a0c92f\",\"cipherparams\":{\"iv\":\"8195c3ad97bc9d7d210e9dc4282f6abf\"},\"cipher\":\"aes-128-ctr\",\"kdf\":\"scrypt\",\"kdfparams\":{\"dklen\":32,\"salt\":\"3d9b3f776b1599daafb230a1209d1677de3442d5c2e0ca1b27d417df791de514\",\"n\":8192,\"r\":8,\"p\":1},\"mac\":\"c7058dca33fcdc0671170a4ad810fa8d752ff4508860c990babc9fa90a8e2472\"}}}";
+
   var pwd = "123456";
   var addr = "0xb80b7e2b6639277f12d0b9b79f283c44f780f8c8";
   var subChainAddr = config.subChainAddr;
@@ -69,7 +71,7 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
        
-        <TouchableHighlight
+        {/* <TouchableHighlight
                     underlayColor='rgb(210,260,260)'
                     style={{padding: 10, marginTop: 10, borderRadius: 5,}}
                     onPress={this.testFetch1.bind(this)}
@@ -83,10 +85,10 @@ export default class App extends React.Component {
                     onPress={this.testFetch2.bind(this)}
                 >
                     <Text >请求2</Text>
-        </TouchableHighlight>
+        </TouchableHighlight> */}
 
         {/* <Text>{this.state.r}</Text> */}
-        <Text>Shake your phone to open the developer menu.</Text>
+        <Text>333333Shake your phone to open the developer menu.</Text>
       </View>
     );
   }
@@ -99,7 +101,7 @@ export default class App extends React.Component {
     //console.log(registerUser("123456"));
 
     // 登录账户     yes
-    //console.log(loginUser(addr, pwd, keystore));
+    //console.log(loginUser(addr, pwd, keystore_login));
 
     // 获取moac和erc20余额     yes
     // getBalance(config.userAddr2, config.marketableTokenAddr).then((data) => {
@@ -118,27 +120,43 @@ export default class App extends React.Component {
     //  console.log(data);
     // })
 
-    // 设置nonce
-    setNonce(config.subChainAddr,config.userAddr1, config.rpcIp).then((data) => {
+    // createTopic
+    // setNonce(config.subChainAddr,config.userAddr1, config.rpcIp).then((data) => {
 
-      // createTopic(1, "start1---------?", 500, 
-      // config.userAddr1, config.pwd, keystore_youTest, config.subChainAddr, config.rpcIp).then((data) => {
-      //   console.log(data);
-      // })
-    //   console.log(approveSubTopic(config.userAddr1, 
-    //     "0x9610d2949054cace9c02ab8be7bdc2759f8f87045d7c011ca81ed6bcfc1322db", config.subChainAddr,
-    //  config.pwd, keystore_youTest, config.rpcIp));
+    //   createTopic(1, "start---------?", 500, 
+    //   config.userAddr1, config.pwd, keystore_youTest, config.subChainAddr, config.rpcIp).then((data) => {
+    //     console.log(data);
+    //   })
 
-    getResult(config.subChainAddr, config.userAddr1, 34, config.rpcIp).then((data) => {
-      console.log(data);
-    })
-    // createSubTopic("0x7a62a51c7f76a29fab874c87a371ffc064d6b7c31650f7287fd59c2364fb9dff", 
-    //   "我的", config.userAddr1, config.pwd, keystore_youTest, config.subChainAddr, config.rpcIp).then((data) => {
-    //   console.log(data);
     // });
 
-    });
+    // createSubTopic
+    // setNonce(config.subChainAddr,config.userAddr1, config.rpcIp).then((data) => {
 
+    //   createSubTopic("0xec861216eb3c83772a347b896d16befd18f2ce5b02d00f70276c0a1e8a54aeb7", 
+    //     "Nihao ", config.userAddr1, config.pwd, keystore_youTest, config.subChainAddr, config.rpcIp).then((data) => {
+    //     console.log(data);
+    //   });
+
+    // });
+
+    // approveSubTopic
+    // setNonce(config.subChainAddr,config.userAddr1, config.rpcIp).then((data) => {
+
+    //     console.log(approveSubTopic(config.userAddr1, 
+    //       "0x5a5c5eafac4dc37df301a4a8aec5a412bcbfa0fb21786d0ea8c424ac98d946af", config.subChainAddr,
+    //    config.pwd, keystore_youTest, config.rpcIp));
+  
+    // });
+
+    // getResult
+    // setNonce(config.subChainAddr,config.userAddr1, config.rpcIp).then((data) => {
+
+    //   getResult(config.subChainAddr, config.userAddr1, 34, config.rpcIp).then((data) => {
+    //     console.log(data);
+    //   })
+
+    // });
     
 
 
@@ -178,7 +196,7 @@ export default class App extends React.Component {
     
 
     // 回答列表(暂未做分页)    yes   0x87745f3b2db17acc69f6c9fe7e531f95a974d3bd4729ccbf18e0a4a658373619
-    // getSubTopicList("0x7a62a51c7f76a29fab874c87a371ffc064d6b7c31650f7287fd59c2364fb9dff",
+    // getSubTopicList("0xec861216eb3c83772a347b896d16befd18f2ce5b02d00f70276c0a1e8a54aeb7",
     //      0,0, config.subChainAddr,config.rpcIp).then((data) => {
     //        console.log(data);
     // });
@@ -200,7 +218,7 @@ export default class App extends React.Component {
     // });
 
     // 我的链问列表    yes
-    // myTopicList(config.userAddr1, config.subChainAddr, config.pwd, keystore_youTest, 
+    // myTopicList(config.userAddr3, config.subChainAddr, config.pwd, keystore_test1, 
     //   config.rpcIp, config.deployLwSolAdmin).then((data) => {
     //   console.log(data);
     // });

@@ -97,13 +97,16 @@ function sleep(d){
 // 创建问题    yes
 export var createTopic = function (award, desc, duration, userAddr, pwd, keystore, subChainAddr, rpcIp) {
   return new Promise((resolve, reject) => {
-    
+    var time1 = new Date().getTime();
     var privatekey = decrypt(keystore, pwd).privateKey + "";
+    var time2 = new Date().getTime();
+    console.log(time2 - time1);
     try{
     var result = {};
     
       
       var nonce = currentNonce();
+      console.log("nonce---------" + nonce);
       createTopicSol(userAddr, pwd, award, duration / config.packPerBlockTime, desc, subChainAddr, nonce, privatekey);
               
       result.topicHash = "";
@@ -227,7 +230,7 @@ export var getTopicList = function (pageNum, pageSize, subChainAddr, rpcIp) {
               };
               getContractInfo(rpcIp,"ScsRPCMethod.GetBlockNumber", postParam4).then(function(currentBlockNum){
 
-                var topic = {};
+              var topic = {};
             	var str = chain3.sha3(key + topicIndex, {"encoding": "hex"}).substring(2);
             	var prefixStr = str.substring(0, str.length - 3);
             	var suffixStr = str.substring(str.length - 3, str.length);
@@ -308,8 +311,8 @@ export var getTopicList = function (pageNum, pageSize, subChainAddr, rpcIp) {
                   flag++;
                   if (flag == topicNum ) {  // 循环从0开始
                     
-                    console.log(topicArr);
-                    resolve(topicArr)
+                    console.log(topicArr.sort(compareByTime));
+                    resolve(topicArr.sort(compareByTime))
                   }
                 }
             });
@@ -424,8 +427,9 @@ export var getSubTopicList = function (topicHash, pageNum, pageSize, subChainAdd
 			}
     }
     if (countFlag == 0) {
-      var blankArr = [];
-      resolve(blankArr);
+      result.isEnable = 1;
+      result.subTopicList = [];
+      resolve(result);  // 问题已经过期
     }
       
 		for (var k in subTopicHashArr)
@@ -503,8 +507,8 @@ export var getSubTopicList = function (topicHash, pageNum, pageSize, subChainAdd
 		    	            flag++;
 		    	            if (flag == countFlag) {
                         result.isEnable = 1;
-                        result.subTopicList = subTopicArr;
-		    	        		resolve(result);
+                        result.subTopicList = subTopicArr.sort(compareByCount);  // 点赞数倒序
+		    	        		  resolve(result);
 		    	        	//	return subTopicArr
 		    	        	}
 		            	} else {
@@ -545,12 +549,9 @@ export var approveSubTopic = function (voter, subTopicHash, subChainAddr, pwd, k
     //   return 1;
     // });
     var nonce = currentNonce();
-    console.log(333333);
     voteOnTopic(voter, pwd, subChainAddr, subTopicHash, nonce, privatekey);
-    console.log(11111);
     result.isSuccess = 1;
     result.nonce = nonce;
-    console.log(22222);
   } catch (e) {
     console.log("点赞报错--------" + e);
     result.isSuccess = 0;
@@ -576,7 +577,6 @@ export var autoCheck = function (userAddr, pwd, keystore, subChainAddr, rpcIp) {
 // 我的链问列表
 export var myTopicList = function (userAddr, subChainAddr, pwd, 
   keystore, rpcIp, deployLwSolAdmin) {
-  //console.log(111111);
   return new Promise ((resolve) => {
     // 先set abi
     var postParam3 = {
@@ -833,3 +833,30 @@ export var getResult = function (subChainAddr, userAddr, nonce, rpcIp){
   
 
 }
+
+
+// 问题列表，按照剩余时间最少的在最前面
+var compareByTime = function (obj1, obj2) {
+	var val1 = obj1.duration;
+	var val2 = obj2.duration;
+    if (val1 < val2) {
+        return -1;
+    } else if (val1 > val2) {
+        return 1;
+    } else {
+        return 0;
+    }            
+} 
+
+// 回答列表，按照点赞数最大在最前面排序
+var compareByCount = function (obj1, obj2) {
+	var val1 = obj1.voteCount;
+	var val2 = obj2.voteCount;
+    if (val1 < val2) {
+        return 1;
+    } else if (val1 > val2) {
+        return -1;
+    } else {
+        return 0;
+    }            
+} 

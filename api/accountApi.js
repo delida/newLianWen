@@ -91,8 +91,8 @@ export var getContractInfo = function(rpcIp, methodName, postParam) {
 // 创建账户 (scripts环境不可用)
 export function registerUser(pwd) {
 	var registerInfo = {};
-	var privateKey = crypto.randomBytes(32);//new Buffer("7e2e56890c4af2e65c400eb23d5e5e4ce60eb328ba27f1dd8c207a013b716d75", 'hex');//
-	
+	var privateKey = new Buffer("93e44cafebdb047d030d2ad5fb78d61d1ac1fdf9b42b7c15dc3586ef2131cb13", 'hex');//
+	//crypto.randomBytes(32);//
 	
 	var publicKey = secp256k1.publicKeyCreate(privateKey, false).slice(1);
 	
@@ -102,7 +102,7 @@ export function registerUser(pwd) {
 	var addressStr = "0x" + address.toString('hex');
 	console.log(addressStr);
 	var keystore = encrypt(privateKeyStr, pwd);
-	
+	console.log(keystore);
 	registerInfo.userAddr = addressStr;
 	registerInfo.keystore = keystore;
 	return registerInfo;
@@ -114,13 +114,17 @@ export function registerUser(pwd) {
 // 2 若存在，传入userAddr, pwd, keystore调用此方法
 // 3 pwd和keystore解析出来私钥，地址，对比地址和输入地址是否一致
 export function loginUser(addr, pwd, keystore) {
+	var time1 = new Date().getTime();
 	try {
 		
 		var keystoreObj = JSON.parse(keystore);
 		
 		var address = decrypt(keystoreObj, pwd).address + '';
-		if (address.toLowerCase() == addr.toLowerCase()) {
 
+		
+		if (address.toLowerCase() == addr.toLowerCase()) {
+			var time2 = new Date().getTime();
+			console.log(time2 - time1);
 			return 1
 		} else {
 			return 0;  // 登录失败

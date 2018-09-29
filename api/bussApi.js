@@ -107,6 +107,7 @@ export var createTopic = function (award, desc, duration, userAddr, pwd, keystor
           try{
             var result = {};
               var nonce = currentNonce();
+              console.log("nonce------------" + nonce);
               createTopicSol(userAddr, pwd, award, duration / config.packPerBlockTime, desc, subChainAddr, nonce, privatekey);
                       
               result.topicHash = "";

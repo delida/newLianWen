@@ -158,6 +158,16 @@ export default class App extends React.Component {
 
     // });
 
+    // getResult
+    // setNonce(config.subChainAddr,config.userAddr1, config.rpcIp).then((data) => {
+
+    // autoCheck(config.userAddr1, config.pwd, keystore_youTest, config.subChainAddr, config.rpcIp).then((data) => {
+    //  console.log(data);
+    //   this.setState({r:data});
+    // });
+
+    // });
+
 
 
    //setItem("addr11111", "0x1111");

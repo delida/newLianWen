@@ -8,6 +8,7 @@ import {testrequestEnterMicrochain} from "./scAccount"
 import {dappredeemFromMicroChain} from "./scAccount"
 import {testsellMintToken} from "./scAccount"
 import {getMicroChainBalance} from "./bussApi"
+import {AsyncStorage} from 'react-native';
 
 //import crypto from 'crypto-browserify';
 
@@ -91,7 +92,7 @@ export var getContractInfo = function(rpcIp, methodName, postParam) {
 // 创建账户 (scripts环境不可用)
 export function registerUser(pwd) {
 	var registerInfo = {};
-	var privateKey = new Buffer("93e44cafebdb047d030d2ad5fb78d61d1ac1fdf9b42b7c15dc3586ef2131cb13", 'hex');//
+	var privateKey = crypto.randomBytes(32); // new Buffer("93e44cafebdb047d030d2ad5fb78d61d1ac1fdf9b42b7c15dc3586ef2131cb13", 'hex');//
 	//crypto.randomBytes(32);//
 	
 	var publicKey = secp256k1.publicKeyCreate(privateKey, false).slice(1);
@@ -114,17 +115,20 @@ export function registerUser(pwd) {
 // 2 若存在，传入userAddr, pwd, keystore调用此方法
 // 3 pwd和keystore解析出来私钥，地址，对比地址和输入地址是否一致
 export function loginUser(addr, pwd, keystore) {
-	var time1 = new Date().getTime();
 	try {
 		
 		var keystoreObj = JSON.parse(keystore);
-		
-		var address = decrypt(keystoreObj, pwd).address + '';
-
-		
+		var decryptVal = decrypt(keystoreObj, pwd);
+		var address = decryptVal.address + '';
+		var privateKey = decryptVal.privateKey + '';
 		if (address.toLowerCase() == addr.toLowerCase()) {
-			var time2 = new Date().getTime();
-			console.log(time2 - time1);
+			AsyncStorage.setItem(address.toLowerCase(), privateKey, (error) => {
+				if (error) {
+					console.log("设置privateKey缓存失败------" + error);
+				} else {
+					console.log("设置privateKey缓存成功------");
+				}
+			});
 			return 1
 		} else {
 			return 0;  // 登录失败
@@ -168,38 +172,50 @@ export var getBalance = function (userAddr, marketableTokenAddr) {
 // 充值（moac兑换主链token, 然后充值进子链）
 export var chargeToken = function (userAddr, value, marketableTokenAddr, pwd, keystore, subChainAddr) {
 	return new Promise((resolve, reject) => {
-		var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
-		try {
-			getBalance(userAddr, marketableTokenAddr).then((balance1) => {    // 查询当前erc20余额
-				console.log("充值兑换前---------" + JSON.stringify(balance1));
-				testbuyMintToken(userAddr, pwd, value,privatekey, subChainAddr); // moac兑换主链erc20
+		//var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
 
-				var interval = setInterval(function(){
-					console.log("wait for buyToken-----");
-					getBalance(userAddr, marketableTokenAddr).then((balance2) => { 
-						if(balance1.erc20Balance != balance2.erc20Balance){   // 每3s执行一次查询是否兑换成功
-							console.log("充值兑换后---------" + JSON.stringify(balance2));
-							console.log("开始子链充值-----");
-							
-							testrequestEnterMicrochain(userAddr, pwd, chain3.toSha(value, 'mc'),    // 兑换成功则执行子链充值，并跳出interval
-								privatekey, subChainAddr).then((data) => {
-									if (data == "success") {
-										resolve(1);    // 充值流程开始后，返回给前台1
-										clearInterval(interval);
-									} else {
-										resolve(2);   // 充值流程进入失败
-									}
-							});  
-							
-						}
-					});	
-				}, 3000);
-			});
-			
-		} catch (e) {
-			console.log("充值报错--------" + e);
-			reject(0);
-		}
+		AsyncStorage.getItem(userAddr, (error, privatekey) => {
+			if (error) {
+				console.log("充值获取私钥失败------" + error);
+			} else {
+				console.log("充值获取私钥成功-----");
+				try {
+					getBalance(userAddr, marketableTokenAddr).then((balance1) => {    // 查询当前erc20余额
+						console.log("充值兑换前---------" + JSON.stringify(balance1));
+						testbuyMintToken(userAddr, pwd, value,privatekey, subChainAddr); // moac兑换主链erc20
+		
+						var interval = setInterval(function(){
+							console.log("wait for buyToken-----");
+							getBalance(userAddr, marketableTokenAddr).then((balance2) => { 
+								if(balance1.erc20Balance != balance2.erc20Balance){   // 每3s执行一次查询是否兑换成功
+									console.log("充值兑换后---------" + JSON.stringify(balance2));
+									console.log("开始子链充值-----");
+									
+									testrequestEnterMicrochain(userAddr, pwd, chain3.toSha(value, 'mc'),    // 兑换成功则执行子链充值，并跳出interval
+										privatekey, subChainAddr).then((data) => {
+											if (data == "success") {
+												resolve(1);    // 充值流程开始后，返回给前台1
+												clearInterval(interval);
+											} else {
+												resolve(2);   // 充值流程进入失败
+											}
+									});  
+									
+								}
+							});	
+						}, 3000);
+					});
+					
+				} catch (e) {
+					console.log("充值报错--------" + e);
+					reject(0);
+				}
+				
+			}	
+		});
+
+
+		
 	});	
 }
 
@@ -211,53 +227,59 @@ export var buyToken = function (userAddr, value) {
 // 提币
 export var redeemToken = function (userAddr, value, marketableTokenAddr, pwd, keystore, subChainAddr, rpcIp) {
 	return new Promise((resolve, reject) => {
-		var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
-		try {
-			getBalance(userAddr, marketableTokenAddr).then((balance1) => {    // 查询当前erc20余额
-				console.log("提币前主链代币---------" + JSON.stringify(balance1));
-			var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr};
-      
-     		 getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam).then(function(nonce){
-				dappredeemFromMicroChain(userAddr, pwd, chain3.toSha(value, 'mc'), nonce, privatekey, subChainAddr).then((data) => {   // 提币
-					if (data == "success") {
-						console.log("start1-----------");
-						// 开始调用定时器
-						redeemTimer(userAddr, pwd, value, privatekey, subChainAddr, marketableTokenAddr, balance1);
-						console.log("start2-----------");
-						resolve(1);
-						// var interval = setInterval(function () {
-						// 	console.log("wait for redeemToken-----");
-						// 	getBalance(userAddr, marketableTokenAddr).then((balance2) => {    // 查询当前erc20余额
-	
-						// 		if (balance1.erc20Balance != balance2.erc20Balance) {   // 每30s执行一次查询是否兑换成功
-						// 			console.log("提币后主链代币---------" + JSON.stringify(balance2));
-						// 			console.log("提币成功，开始兑换moac-----");
-						// 			testsellMintToken(userAddr, pwd, chain3.toSha(value, 'mc'), privatekey, subChainAddr);  // 提币成功则执行moac兑换，并跳出interval
-						// 			clearInterval(interval);
-						// 			resolve(1);
-						// 		}
-						// 	});
-						// }, 30000);
-					} else {
-						resolve(2); 
-					}
-					
-				});
+		//var privatekey = decrypt(JSON.parse(keystore), pwd).privateKey + "";
 
-			});
-			});
-
-		} catch (e) {
-			console.log("提币报错--------" + e);
-			reject(0);
-		}
+		AsyncStorage.getItem(userAddr, (error, privatekey) => {
+			if (error) {
+				console.log("提币获取私钥失败------" + error);
+			} else {
+				console.log("提币获取私钥成功-----");
+				try {
+					getBalance(userAddr, marketableTokenAddr).then((balance1) => {    // 查询当前erc20余额
+						console.log("提币前主链代币---------" + JSON.stringify(balance1));
+					var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr};
+			  
+					  getContractInfo(rpcIp, "ScsRPCMethod.GetNonce", postParam).then(function(nonce){
+						dappredeemFromMicroChain(userAddr, pwd, chain3.toSha(value, 'mc'), nonce, privatekey, subChainAddr).then((data) => {   // 提币
+							if (data == "success") {
+								console.log("start1-----------");
+								// 开始调用定时器
+								redeemTimer(userAddr, pwd, value, privatekey, subChainAddr, marketableTokenAddr, balance1);
+								console.log("start2-----------");
+								resolve(1);
+								// var interval = setInterval(function () {
+								// 	console.log("wait for redeemToken-----");
+								// 	getBalance(userAddr, marketableTokenAddr).then((balance2) => {    // 查询当前erc20余额
+			
+								// 		if (balance1.erc20Balance != balance2.erc20Balance) {   // 每30s执行一次查询是否兑换成功
+								// 			console.log("提币后主链代币---------" + JSON.stringify(balance2));
+								// 			console.log("提币成功，开始兑换moac-----");
+								// 			testsellMintToken(userAddr, pwd, chain3.toSha(value, 'mc'), privatekey, subChainAddr);  // 提币成功则执行moac兑换，并跳出interval
+								// 			clearInterval(interval);
+								// 			resolve(1);
+								// 		}
+								// 	});
+								// }, 30000);
+							} else {
+								resolve(2); 
+							}
+						});
+		
+					});
+					});
+		
+				} catch (e) {
+					console.log("提币报错--------" + e);
+					resolve(0);
+				}
+			}
+		});
 	});
 	
 }
 
 // 提币定时器
 function redeemTimer(userAddr, pwd, value, privatekey, subChainAddr, marketableTokenAddr, balance1) {
-	console.log("start3-----------");
 	var interval = setInterval(function () {
 		console.log("wait for redeemToken-----");
 		getBalance(userAddr, marketableTokenAddr).then((balance2) => {    // 查询当前erc20余额
@@ -280,4 +302,39 @@ function redeemTimer(userAddr, pwd, value, privatekey, subChainAddr, marketableT
 // 		myNonce = nonce;
 // 	});
 // } 
+
+// 缓存测试
+export var setItem = function(addr, privateKey) {
+	AsyncStorage.setItem(addr, privateKey, (error) => {
+		if (error) {
+			console.log("set fail-----" + error);
+		} else {
+			console.log("set success");
+		}
+	});
+}
+
+export var getItem = function(addr) {
+	var flag = "";
+	AsyncStorage.getItem(addr, (error, result) => {
+		if (error) {
+			console.log("get fail------" + error);
+		} else {
+			console.log("get success-----" + result);
+			flag = result;
+			
+		}	
+	});
+	return flag;
+}
+
+export var removeItem = function(addr) {
+	AsyncStorage.removeItem(addr, (error) => {
+		if (!error) {
+			console.log("remove success");
+		} else {
+			console.log("remove fail---------" + error);
+		}
+	});
+} 
 

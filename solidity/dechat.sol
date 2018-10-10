@@ -99,6 +99,7 @@ contract DeChat is DappBase{
 		bytes32 hash;
 		address owner;
 		string desc;
+		uint reward;
 		bytes32 parent;
 		uint voteCount;
 		address[] voters;
@@ -118,7 +119,7 @@ contract DeChat is DappBase{
 	uint public votePrize = 20; //
 	uint public modPrize = 9;
 	uint public devPrize = 1; 
-	uint public voteAwardCount = 100; //only firt 100 voter get reward
+	uint public voteAwardCount = 100; //only first 100 voter get reward
 	uint public maxExpBlk = 50;
 	
 	address internal owner;
@@ -202,6 +203,7 @@ contract DeChat is DappBase{
 		subTopics[hash].hash = hash;
 		subTopics[hash].owner = msg.sender;
 		subTopics[hash].desc = desc;
+		subTopics[hash].reward = 0;
 		subTopics[hash].parent = parenthash;
 		//add to ans list
 		topicAns[parenthash].push(hash);
@@ -236,7 +238,9 @@ contract DeChat is DappBase{
 				//best topic
 				bytes32 besthash = topics[phash].bestHash;
 				if(subTopics[besthash].owner != address(0) ){
-					subTopics[besthash].owner.transfer( topics[phash].award * firstPrize /100 );
+					uint reward1 = topics[phash].award * firstPrize /100;
+					subTopics[besthash].owner.transfer(reward1);
+					subTopics[besthash].reward = reward1;
 				}
 				
 				//award each voter for besthash
@@ -247,7 +251,9 @@ contract DeChat is DappBase{
 				//second best topic
 				bytes32 secondBesthash = topics[phash].secondBestHash;
 				if(subTopics[secondBesthash].owner != address(0) ){
-					subTopics[secondBesthash].owner.transfer( topics[phash].award * secondPrize /100 );
+					uint reward2 = topics[phash].award * secondPrize /100;
+					subTopics[secondBesthash].owner.transfer(reward2);
+					subTopics[secondBesthash].reward = reward2;
 				}
 				
 				// award moderator

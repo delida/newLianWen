@@ -14,6 +14,7 @@ contract DeChatManagement {
         bytes32 boardName;
         bytes32 picPath;
         uint boardStatus;
+        uint exchangeRate;
     }
     
     BoardInfo[] public boardList;
@@ -23,9 +24,9 @@ contract DeChatManagement {
 		owner = msg.sender;
 	}
 	
-	function creatBoard(address subchainAddr, address deployLwSolAdmin, address marketableTokenAddr, bytes32 rpcIp, bytes32 boardName, bytes32 picPath) public {
+	function creatBoard(address subchainAddr, address deployLwSolAdmin, address marketableTokenAddr, bytes32 rpcIp, bytes32 boardName, bytes32 picPath, uint exchangeRate) public {
 	    require(owner == msg.sender);
-        boardList.push(BoardInfo(subchainAddr, deployLwSolAdmin, marketableTokenAddr, rpcIp, boardName, picPath, uint(BoardStatus.working)));
+        boardList.push(BoardInfo(subchainAddr, deployLwSolAdmin, marketableTokenAddr, rpcIp, boardName, picPath, uint(BoardStatus.working), exchangeRate));
     }
     
     function getBoardlist(uint status) public constant returns (address[], bytes32[], uint[]) {
@@ -39,7 +40,7 @@ contract DeChatManagement {
         
         address[] memory addrlist = new address[](j*3);
         bytes32[] memory byteslist = new bytes32[](j*3);
-        uint[] memory boardStatuslist = new uint[](j);
+        uint[] memory uintlist = new uint[](j*2);
         j = 0;
         for (i = 0; i < boardList.length; i++) {
             if(boardList[i].boardStatus == status) {
@@ -49,11 +50,12 @@ contract DeChatManagement {
                 byteslist[j*3] = boardList[i].rpcIp;
                 byteslist[j*3+1] = boardList[i].boardName;
                 byteslist[j*3+2] = boardList[i].picPath;
-                boardStatuslist[j] = boardList[i].boardStatus;
+                uintlist[j*2] = boardList[i].boardStatus;
+                uintlist[j*2+1] = boardList[i].exchangeRate;
                 j++;
             }
         }
-        return (addrlist, byteslist, boardStatuslist);
+        return (addrlist, byteslist, uintlist);
     }
     
     function updateBoardStatus(uint status, address subchainAddr) public {

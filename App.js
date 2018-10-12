@@ -30,7 +30,6 @@ import {testbuyMintToken} from './api/scAccount';
 import {myHistoryList} from './api/accountApi';
 
 // import youdao from 'youdao-node';
-import { youdao, baidu, google} from 'translation.js'
 
 import config from "./api/lwconfig.json"
 
@@ -105,11 +104,11 @@ export default class App extends React.Component {
     );
   }
 
-  // renderTest() {
+  renderTest() {
 
-  //   myHistoryList(0, 0, config.userAddr2, config.subChainAddr, config.rpcIp).then ((data) => {
-  //     console.log(data);
-  //   });
+    // myHistoryList(0, 0, config.userAddr2, config.subChainAddr, config.rpcIp).then ((data) => {
+    //   console.log(data);
+    // });
 
     //testbuyMintToken(config.userAddr2, "moac", "10", "0xb15132deb02906c665debda4905f6dc4cd82ddcb31436486bf0881303b5f7cba", "0xdfb59956eaeb2ccc78c013e45c09e6f4c7283523");
 

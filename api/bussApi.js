@@ -716,9 +716,86 @@ export var getCnNames = function (names) {
 }
 
 // 获取版块列表
+// export var getBoardList = function () {
+//   return new Promise ((resolve) => {
+//     dechatmanagement.getBoardlist(1,function(err, result){
+//       var boardList = [];
+      
+//       var arr1 = result[0];
+//       var arr2 = result[1];
+//       var arr3 = result[2];
+
+//       var subAddrArr = [];
+//       var dlsAdminArr = [];
+//       var marketableTokenArr = [];
+//       var rpcIpArr = [];
+//       var boardNameArr = [];
+//       var picPathArr = [];
+//       var exchangeRateArr = [];
+
+//       for (key in arr1) {
+        
+//         if (key % 3 == 0) {
+//           subAddrArr.push(arr1[key]);
+//         }
+//         if (key % 3 == 1) {
+//           dlsAdminArr.push(arr1[key]);
+//         }
+//         if (key % 3 == 2) {
+//           marketableTokenArr.push(arr1[key]);
+//         }
+//       }
+
+//       for (key in arr2) {
+        
+//         if (key % 3 == 0) {
+//           rpcIpArr.push(utf8HexToStr(arr2[key].substring(2)));
+//         }
+//         if (key % 3 == 1) {
+//           boardNameArr.push(utf8HexToStr(arr2[key].substring(2)));
+//         }
+//         if (key % 3 == 2) {
+//           picPathArr.push(utf8HexToStr(arr2[key].substring(2)));
+//         }
+//       }
+
+//       for (key in arr3) {
+//         if (key % 2 == 1) {
+//           exchangeRateArr.push(arr3[key]);
+//         }
+//       }
+
+//       var finalArr = [];
+//       getCnNames(boardNameArr).then((boardNameCnArr) => {
+//         finalArr.push(subAddrArr);
+//         finalArr.push(dlsAdminArr);
+//         finalArr.push(marketableTokenArr);
+//         finalArr.push(rpcIpArr);
+//         finalArr.push(boardNameCnArr);
+//         finalArr.push(picPathArr);
+//         finalArr.push(exchangeRateArr);
+
+//         for (var i = 0; i < subAddrArr.length; i++) {
+//           var board = {};
+//           board.subChainAddress = finalArr[0][i];
+//           board.deployLwSolAdmin = finalArr[1][i];
+//           board.marketableTokenAddr = finalArr[2][i];
+//           board.rpcIp = finalArr[3][i];
+//           board.boardName = finalArr[4][i];
+//           board.picPath = finalArr[5][i];
+//           board.exchangeRate = finalArr[6][i];
+//           boardList.push(board);
+//         }
+//         resolve(boardList);
+//       });
+      
+//     });
+//   });   
+// }
 export var getBoardList = function () {
   return new Promise ((resolve) => {
     dechatmanagement.getBoardlist(1,function(err, result){
+      console.log(result);
       var boardList = [];
       
       var arr1 = result[0];
@@ -766,29 +843,27 @@ export var getBoardList = function () {
       }
 
       var finalArr = [];
-      getCnNames(boardNameArr).then((boardNameCnArr) => {
-        finalArr.push(subAddrArr);
-        finalArr.push(dlsAdminArr);
-        finalArr.push(marketableTokenArr);
-        finalArr.push(rpcIpArr);
-        finalArr.push(boardNameCnArr);
-        finalArr.push(picPathArr);
-        finalArr.push(exchangeRateArr);
+      finalArr.push(subAddrArr);
+      finalArr.push(dlsAdminArr);
+      finalArr.push(marketableTokenArr);
+      finalArr.push(rpcIpArr);
+      finalArr.push(boardNameArr);
+      finalArr.push(picPathArr);
+      finalArr.push(exchangeRateArr);
 
-        for (var i = 0; i < subAddrArr.length; i++) {
-          var board = {};
-          board.subChainAddress = finalArr[0][i];
-          board.deployLwSolAdmin = finalArr[1][i];
-          board.marketableTokenAddr = finalArr[2][i];
-          board.rpcIp = finalArr[3][i];
-          board.boardName = finalArr[4][i];
-          board.picPath = finalArr[5][i];
-          board.exchangeRate = finalArr[6][i];
-          boardList.push(board);
-        }
-        resolve(boardList);
-      });
+      for(var i = 0; i < subAddrArr.length; i++) {
+        var board = {};
+        board.subChainAddress = finalArr[0][i];
+        board.deployLwSolAdmin = finalArr[1][i];
+        board.marketableTokenAddr = finalArr[2][i];
+        board.rpcIp = finalArr[3][i];
+        board.boardName = finalArr[4][i];
+        board.picPath = finalArr[5][i];
+        board.exchangeRate = finalArr[6][i];
+        boardList.push(board);
+      }
       
+      resolve(boardList);
     });
   });   
 }

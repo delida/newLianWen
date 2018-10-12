@@ -70,7 +70,8 @@ export var getContractInfo = function(rpcIp, methodName, postParam) {
     return new Promise(function(resolve, reject){
         _post(rpcIp, data).then((datas) => {
             //console.log("datas---------" + JSON.stringify(datas))
-            var rpcResult;
+			var rpcResult;
+			console.log(datas);
             //console.log(datas.result);
             if (datas.result == undefined) {
                 rpcResult == "have exception";
@@ -333,7 +334,7 @@ export var transferCoin = function (from, to, amount, subChainAddr, pwd, keystor
 }
 
 // 充值提币历史（充值包括进行中，已完成，   提币包括进行中，已完成。   时间倒叙）
-export function myHistoryList(userAddr, subChainAddr, rpcIp) {
+export function myHistoryList(pageNum, pageSize, userAddr, subChainAddr, rpcIp) {
 	var postParam = {"SubChainAddr": subChainAddr, "Sender": userAddr};
 	return new Promise ((resolve) => {
 		getContractInfo(rpcIp, "ScsRPCMethod.GetTransactionRecords", postParam).then(function(result){
